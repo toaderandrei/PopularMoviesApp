@@ -11,7 +11,6 @@ dependencies {
     api(project(":core:common"))
     implementation(project(":core:models"))
     implementation(project(":core:tmdbApi"))
-    implementation(project(":core:database"))
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlin.serialization)

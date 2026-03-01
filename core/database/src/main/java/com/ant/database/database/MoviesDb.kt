@@ -4,21 +4,21 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.ant.database.converters.TmdbTypeConverters
-import com.ant.models.entities.MovieCast
-import com.ant.models.entities.MovieCrew
-import com.ant.models.entities.MovieData
-import com.ant.models.entities.MovieReview
-import com.ant.models.entities.MovieVideo
-import com.ant.models.entities.TvShow
+import com.ant.database.entity.MovieCastEntity
+import com.ant.database.entity.MovieCrewEntity
+import com.ant.database.entity.MovieDataEntity
+import com.ant.database.entity.MovieReviewEntity
+import com.ant.database.entity.MovieVideoEntity
+import com.ant.database.entity.TvShowEntity
 
 @Database(
     entities = [
-        MovieData::class,
-        TvShow::class,
-        MovieCast::class,
-        MovieReview::class,
-        MovieCrew::class,
-        MovieVideo::class,
+        MovieDataEntity::class,
+        TvShowEntity::class,
+        MovieCastEntity::class,
+        MovieReviewEntity::class,
+        MovieCrewEntity::class,
+        MovieVideoEntity::class,
    ],
     version = 41,
     exportSchema = false

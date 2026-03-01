@@ -4,25 +4,25 @@ import androidx.room.Query
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Dao
-import com.ant.models.entities.MovieVideo
+import com.ant.database.entity.MovieVideoEntity
 
 @Dao
 abstract class MovieVideosDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(vararg movie: MovieVideo)
+    abstract fun insert(vararg movie: MovieVideoEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insert(movie: MovieVideo)
+    abstract fun insert(movie: MovieVideoEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertAll(vararg movieVideos: MovieVideo)
+    abstract suspend fun insertAll(vararg movieVideos: MovieVideoEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertAll(movieVideos: List<MovieVideo>)
+    abstract suspend fun insertAll(movieVideos: List<MovieVideoEntity>)
 
     @Query("SELECT * FROM MovieVideo WHERE  movie_id = :movieId")
-    abstract suspend fun loadVideosForMovieId(movieId: Long): List<MovieVideo>
+    abstract suspend fun loadVideosForMovieId(movieId: Long): List<MovieVideoEntity>
 
     @Query("DELETE FROM MovieVideo WHERE  movie_id = :movieId")
     abstract suspend fun deleteMovieVideosById(movieId: Long)

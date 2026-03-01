@@ -2,6 +2,48 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Working Preferences
+
+### Before Writing Code
+- Explain clearly what and why
+- If it is a new topic, do a deep dive, preferably use architect mode to deep dive
+- Always document existing findings, current solution
+- Never write code without my approval
+
+### Writing Code
+- All code should be testable
+- Use SOLID principles as much as possible
+- Use Android guidelines when writing code
+- For Gradle always look at build-logic folder for inspiration or for updating existing plugins
+- Tests should always start with "Should"
+- If tests are repeatable try to use Parameterized tests
+- If tests need data that is reusable in other tests, try to either use a TestData class and if it doesn't exist, try to create it
+
+### Issue/Task Context
+
+To get information on the task you're working on, use the Notion MCP tool (mention this should be installed if not found).
+Search for the Notion issue related to this branch by filtering the EngTask database on the branch name.
+Always fetch this information if you're asked to "Work on this branch" / "Work on this task".
+
+### Merge Requests
+
+For description use this format:
+
+#### Problem
+- Explain the problem in detail with reproduction steps
+
+#### Implementation
+- Explain the solution in detail and why it was chosen and how it fixes the problem.
+
+##### Code Changes
+- Explain code change in detail and why it was done. Do not get into details of the implementation, show the classes involved and the changes made.
+
+#### Testing
+- Explain how the solution was tested.
+
+#### Demo
+- If possible, add a video of the solution working.
+
 ## Project Overview
 
 Popular Movies is a Kotlin-based Android application that showcases popular movies and TV series using The Movie Database (TMDb) API. The app follows Clean Architecture principles with MVVM pattern and is organized into feature modules.
@@ -41,11 +83,11 @@ The project follows Clean Architecture with clear separation of concerns:
 - **core**: Shared infrastructure and business logic
   - `core:domain` - Use cases (business logic orchestration)
   - `core:data` - Repository implementations
-  - `core:database` - Room database for local persistence
+  - `core:database` - Room database, entity classes (`entity/`), entity-domain mappers (`mapper/`)
   - `core:network` - Network layer configuration
   - `core:tmdbApi` - TMDb API client interfaces
   - `core:datastore` - DataStore for preferences/settings
-  - `core:models` - Data models and DTOs
+  - `core:models` - Pure Kotlin domain models and DTOs (no Room annotations)
   - `core:common` - Shared utilities, dispatcher qualifiers, DI modules
   - `core:ui` - Shared UI components, navigation destinations
   - `core:resources` - Shared resources (strings, drawables, etc.)
@@ -69,6 +111,7 @@ The project follows Clean Architecture with clear separation of concerns:
 
 - **Result Wrapper**: All use cases return `Flow<Result<T>>` where Result is Loading, Success, or Error
 - **Repository Pattern**: Single responsibility repositories (e.g., `LoadMovieListRepository`, `SaveMovieDetailsToLocalRepository`)
+- **Entity-Domain Mapping**: Room entities in `core:database/entity/` map to/from domain models via `toDomain()`/`toEntity()` extension functions in `core:database/mapper/EntityMappers.kt`. Mapping happens at the repository boundary in `core:data`.
 - **Dependency Injection**: Hilt for DI throughout all layers
 - **Coroutine Dispatchers**: Injected via qualifiers (`@IoDispatcher`, `@DefaultDispatcher`, `@MainDispatcher`, `@MainImmediateDispatcher`)
 - **Application Scope**: `@ApplicationScope CoroutineScope` with `SupervisorJob()` for app-level work (provided by `CoroutinesModule`)
@@ -90,6 +133,9 @@ The project follows Clean Architecture with clear separation of concerns:
 
 # Run all tests
 ./gradlew test
+
+# Run single test
+./gradlew :module:test --tests "TestClass.testMethod"
 
 # Run connected (instrumented) tests on device/emulator
 ./gradlew connectedAndroidTest
@@ -162,7 +208,8 @@ When adding new dependencies:
 1. Features depend on core modules (domain, data, models, ui, resources)
 2. Core modules have specific dependencies:
    - `core:domain` depends on `core:data`, `core:models` (Note: ideally domain should not depend on data -- see proposals)
-   - `core:data` depends on `core:domain`, `core:models`, `core:network`, `core:database`, `core:datastore`
+   - `core:data` depends on `core:domain`, `core:models`, `core:network`, `core:database`, `core:datastore` (uses `core:database` mappers for entity↔domain conversion)
+   - `core:database` depends on `core:models` (for domain types used in mappers and `VideoType` enum)
    - `core:common` provides dispatcher qualifiers, `@ApplicationScope`, and shared utilities
    - `core:datastore` depends on `core:common` (for `@ApplicationScope` qualifier) and `core:models`
    - `core:tmdbApi` is isolated for API definitions
@@ -187,6 +234,7 @@ Each feature defines its navigation in a dedicated `navigation/` package with:
 - Repositories: Suffixed with `Repository` (e.g., `LoadMovieListRepository`)
 - Route composables: Suffixed with `Route` (e.g., `MoviesRoute`)
 - Screen composables: Suffixed with `Screen` (e.g., `MoviesScreen`)
+- Always follow existing naming and formatting conventions in files
 
 ### Package Structure
 - Base package: `com.ant.<layer>.<feature>`

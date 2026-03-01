@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:resources"))
     implementation(project(":core:domain"))
+    implementation(project(":core:data"))
     implementation(project(":core:analytics"))
     implementation(project(":core:tmdbApi"))
     implementation(project(":core:datastore"))

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
@@ -27,8 +26,10 @@ import androidx.compose.ui.unit.dp
 import com.ant.feature.favorites.FavoriteTab
 import com.ant.feature.favorites.FavoritesUiState
 import com.ant.feature.favorites.ui.components.SyncStatusIcon
-import com.ant.feature.movies.ui.components.MovieCard
-import com.ant.feature.tvshow.ui.components.TvShowCard
+import com.ant.ui.components.ErrorState
+import com.ant.ui.components.LoadingState
+import com.ant.ui.components.MovieCard
+import com.ant.ui.components.TvShowCard
 import com.ant.models.entities.MovieData
 import com.ant.models.entities.TvShow
 import com.ant.models.request.FavoriteType
@@ -155,34 +156,6 @@ fun FavoritesScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun LoadingState(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun ErrorState(
-    error: String,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier.padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = error,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.error,
-            textAlign = TextAlign.Center
-        )
     }
 }
 

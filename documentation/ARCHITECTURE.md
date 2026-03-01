@@ -103,8 +103,8 @@ features/
 core/
 +-- domain/                    # Use cases (business logic)
 +-- data/                      # Repository implementations
-+-- models/                    # Data models, entities, Room annotations
-+-- database/                  # Room database
++-- models/                    # Data models, entities (pure Kotlin, no Room)
++-- database/                  # Room database, entity classes, entity-domain mappers
 +-- network/                   # Network layer, data sources
 +-- tmdbApi/                   # TMDb API client (uwetrottmann/tmdb-java)
 +-- datastore/                 # DataStore preferences (session, guest mode)
@@ -265,7 +265,7 @@ Review conducted 2026-02-21 using specialized agents. Issues prioritized by seve
 | Severity | Issue | Location |
 |---|---|---|
 | CRITICAL | `core:domain` depends on `core:data` (inverted dependency). Use cases import concrete repositories instead of interfaces. | `core/domain/build.gradle.kts` |
-| HIGH | `core:models` has Room + Firebase dependencies (should be pure Kotlin) | `core/models/build.gradle.kts` |
+| ~~HIGH~~ | ~~`core:models` has Room + Firebase dependencies (should be pure Kotlin)~~ | ~~`core/models/build.gradle.kts`~~ | **FIXED** — Room entities split to `core:database/entity/`, mappers in `core:database/mapper/` |
 | MEDIUM | Feature-to-feature dependencies: favorites/search depend on movies/tvshow for shared UI components (MovieCard, TvShowCard) | `features/favorites/`, `features/search/` |
 | MEDIUM | `core:network` depends on `core:database` | `core/network/build.gradle.kts` |
 

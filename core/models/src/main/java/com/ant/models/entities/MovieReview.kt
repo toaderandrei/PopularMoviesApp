@@ -1,32 +1,15 @@
 package com.ant.models.entities
 
-import androidx.room.*
-
-@Entity(
-    tableName = "MovieReview",
-    indices = [
-        Index(value = ["movie_id"])],
-    foreignKeys = [
-        ForeignKey(
-            entity = MovieData::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("movie_id"),
-            onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.CASCADE
-        )]
-)
 data class MovieReview(
-    @PrimaryKey
-    @ColumnInfo(name = "id") override val id: Long = 0,
+    override val id: Long = 0,
 
-    @ColumnInfo(name = "author")
-    override val name: String?,
+    override val name: String? = null,
 
-    @ColumnInfo(name = "content") val content: String?,
+    val content: String? = null,
 
-    @ColumnInfo(name = "url") val url: String?,
+    val url: String? = null,
 
-    @ColumnInfo(name = "movie_id") var movieId: Long = 0,
+    var movieId: Long = 0,
 
-    @ColumnInfo(name = "tmdb_id") val tmdbId: Int? = null,
+    val tmdbId: Int? = null,
 ) : TmdbEntity

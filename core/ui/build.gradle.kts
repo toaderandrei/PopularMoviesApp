@@ -1,6 +1,7 @@
 plugins {
-    alias(libs.plugins.popular.movies.android.feature)
+    alias(libs.plugins.popular.movies.android.library)
     alias(libs.plugins.popular.movies.android.library.compose)
+    alias(libs.plugins.popular.movies.hilt)
 }
 
 android {
@@ -13,7 +14,6 @@ dependencies {
     implementation(project(":core:models"))
     implementation(project(":core:tmdbApi"))
 
-
     // Coil compose
     implementation(libs.coil.kt.compose)
     implementation(libs.coil)
@@ -22,4 +22,8 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons)
     implementation(libs.androidx.compose.ui)
+
+    // Tooling and preview
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    debugImplementation(libs.androidx.compose.ui.tooling)
 }

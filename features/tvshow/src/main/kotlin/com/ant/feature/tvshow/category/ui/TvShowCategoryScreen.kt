@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ant.feature.tvshow.category.TvShowCategoryUiState
-import com.ant.feature.tvshow.ui.components.TvShowCard
+import com.ant.ui.components.TvShowCard
 import com.ant.models.entities.TvShow
 import com.ant.models.request.TvShowType
 

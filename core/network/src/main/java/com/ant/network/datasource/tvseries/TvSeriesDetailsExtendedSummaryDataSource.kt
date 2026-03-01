@@ -5,8 +5,8 @@ import com.ant.common.exceptions.bodyOrThrow
 import com.ant.common.exceptions.withRetry
 import com.ant.models.entities.TvShowDetails
 import com.ant.models.request.RequestType
-import com.ant.models.request.toAppendRequest
-import com.ant.models.request.toMovieId
+import com.ant.network.extensions.toAppendRequest
+import com.ant.network.extensions.toMovieId
 import com.ant.network.mappers.tvseries.TvSeriesDetailsMapper
 import com.uwetrottmann.tmdb2.Tmdb
 import retrofit2.awaitResponse

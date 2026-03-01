@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ant.feature.movies.category.MovieCategoryUiState
-import com.ant.feature.movies.ui.components.MovieCard
+import com.ant.ui.components.MovieCard
 import com.ant.models.entities.MovieData
 import com.ant.models.request.MovieType
 

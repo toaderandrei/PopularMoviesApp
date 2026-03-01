@@ -1,38 +1,21 @@
 package com.ant.models.entities
 
-import androidx.room.*
-
-@Entity(
-    tableName = "MovieVideo",
-    indices = [
-        Index(value = ["movie_id"])],
-    foreignKeys = [
-        ForeignKey(
-            entity = MovieData::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("movie_id"),
-            onUpdate = ForeignKey.CASCADE,
-            onDelete = ForeignKey.CASCADE
-        )]
-)
 data class MovieVideo(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id") override var id: Long = 0,
+    override var id: Long = 0,
 
-    @ColumnInfo(name = "key") val key: String?,
+    val key: String? = null,
 
-    @ColumnInfo(name = "name")
-    override val name: String?,
+    override val name: String? = null,
 
-    @ColumnInfo(name = "iso_639_1") val iso_639_1: String?,
+    val iso_639_1: String? = null,
 
-    @ColumnInfo(name = "iso_3166_1") val iso_3166_1: String?,
+    val iso_3166_1: String? = null,
 
-    @ColumnInfo(name = "site") val site: String?,
+    val site: String? = null,
 
-    @ColumnInfo(name = "size") val size: Int?,
+    val size: Int? = null,
 
-    @ColumnInfo(name = "type") val type: VideoType?,
+    val type: VideoType? = null,
 
-    @ColumnInfo(name = "movie_id") var movieId: Long = 0,
+    var movieId: Long = 0,
 ) : TmdbEntity

@@ -2,7 +2,7 @@ package com.ant.network.datasource.movies
 
 import com.ant.common.exceptions.bodyOrThrow
 import com.ant.common.logger.Logger
-import com.ant.models.extensions.toMediaType
+import com.ant.network.extensions.toMediaType
 import com.ant.models.request.RequestType
 import com.uwetrottmann.tmdb2.Tmdb
 import com.uwetrottmann.tmdb2.entities.FavoriteMedia
