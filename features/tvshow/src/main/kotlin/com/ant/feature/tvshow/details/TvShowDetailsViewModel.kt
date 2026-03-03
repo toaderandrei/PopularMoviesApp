@@ -9,17 +9,15 @@ import com.ant.domain.usecases.tvseries.TvSeriesDetailsUseCase
 import com.ant.models.model.Result
 import com.ant.models.request.RequestType
 import com.ant.models.request.TvSeriesAppendToResponseItem
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class TvShowDetailsViewModel @Inject constructor(
+
+class TvShowDetailsViewModel constructor(
     private val savedStateHandle: SavedStateHandle,
     private val tvSeriesDetailsUseCase: TvSeriesDetailsUseCase,
     private val saveTvSeriesDetailsUseCase: SaveTvSeriesDetailsUseCase,

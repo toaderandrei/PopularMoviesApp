@@ -2,7 +2,7 @@
 
 ## Overview
 
-The TMDb App follows **Clean Architecture** with **MVVM pattern** and is built entirely with **Jetpack Compose**. All features use Compose screens, and the XML-to-Compose migration is complete (no Fragments, ViewBinding, or RecyclerView remain).
+The TMDb App follows **Clean Architecture** with **MVVM pattern** and is built with **Jetpack Compose** and **Kotlin Multiplatform (KMP)**. All features use Compose screens, and the XML-to-Compose migration is complete (no Fragments, ViewBinding, or RecyclerView remain).
 
 ---
 
@@ -105,13 +105,14 @@ core/
 +-- data/                      # Repository implementations
 +-- models/                    # Data models, entities (pure Kotlin, no Room)
 +-- database/                  # Room database, entity classes, entity-domain mappers
-+-- network/                   # Network layer, data sources
-+-- tmdbApi/                   # TMDb API client (uwetrottmann/tmdb-java)
++-- network/                   # Ktor-based network layer, data sources
 +-- datastore/                 # DataStore preferences (session, guest mode)
-+-- common/                    # Shared utilities, dispatchers, logger
++-- common/                    # Shared utilities, Koin DI, Kermit logging
 +-- ui/                        # Shared UI (navigation destinations, Coil setup)
 +-- resources/                 # Shared strings, drawables
 +-- analytics/                 # Firebase Analytics/Crashlytics
+
+shared/                            # KMP shared framework (iOS export)
 ```
 
 ### Module Dependencies
@@ -119,7 +120,7 @@ core/
 ```
 features/* --> core:domain, core:models, core:ui, core:resources
 core:domain --> core:data, core:models
-core:data --> core:models, core:network, core:database, core:tmdbApi
+core:data --> core:models, core:network, core:database
 core:datastore --> core:common, core:models
 app --> features/*, core/*
 ```
@@ -226,7 +227,7 @@ Each use case is a plain class with an `operator fun invoke(...)` returning `Flo
 
 ### Repository Pattern
 
-Repositories are plain `@Singleton` classes with `suspend fun performRequest()`. No base interface. Injected by concrete type via Hilt.
+Repositories are plain classes with `suspend fun performRequest()`. Interface defined in `core:domain`, implementation in `core:data`. Injected via Koin `single` definitions.
 
 ### Session & Guest Mode
 
@@ -248,9 +249,9 @@ Repositories are plain `@Singleton` classes with `suspend fun performRequest()`.
 |---|---|
 | UI | Jetpack Compose, Material 3, Coil, Navigation Compose |
 | State | StateFlow, Kotlin Coroutines, Flow |
-| Architecture | MVVM, Clean Architecture, Hilt DI |
-| Network | Retrofit + OkHttp, Kotlin Serialization |
-| Persistence | Room, DataStore |
+| Architecture | MVVM, Clean Architecture, Koin DI, KMP |
+| Network | Ktor Client, Kotlin Serialization |
+| Persistence | Room KMP, DataStore KMP |
 | Analytics | Firebase Analytics, Crashlytics |
 | Testing | JUnit, MockK |
 
@@ -306,13 +307,13 @@ Review conducted 2026-02-21 using specialized agents. Issues prioritized by seve
 
 | Severity | Issue | Location |
 |---|---|---|
-| CRITICAL | Redundant Hilt dependencies declared both by convention plugin AND manually in 4+ modules | core:tmdbApi, core:domain, core:analytics, app |
-| MAJOR | ~20+ unused entries in version catalog (legacy View-based libraries) | `gradle/libs.versions.toml` |
+| ~~CRITICAL~~ | ~~Redundant Hilt dependencies~~ | **DONE** -- Hilt removed, migrated to Koin |
+| ~~MAJOR~~ | ~~~20+ unused entries in version catalog~~ | **DONE** -- Cleaned up in KMP migration |
 | MAJOR | 4 duplicate lifecycle version entries, 2 duplicate navigation versions | `gradle/libs.versions.toml` |
 | MAJOR | Feature convention plugin missing common dependencies (core:ui, core:domain, Compose) -- repeated in all 5 features | `AndroidFeatureConventionPlugin.kt` |
 | MODERATE | Debug `println` in HiltConventionPlugin and AndroidBuildConfigPlugin | `build-logic/convention/` |
-| MODERATE | Dual serialization: Gson + Kotlin Serialization both in use | `core/models/`, `core/database/` |
-| MINOR | `settings.gradle` is Groovy, rest of project uses Kotlin DSL | Root |
+| ~~MODERATE~~ | ~~Dual serialization: Gson + Kotlin Serialization~~ | **DONE** -- Fully migrated to Kotlin Serialization |
+| ~~MINOR~~ | ~~`settings.gradle` is Groovy~~ | **DONE** -- Converted to `settings.gradle.kts` |
 
 ### Testing
 
@@ -350,12 +351,14 @@ Review conducted 2026-02-21 using specialized agents. Issues prioritized by seve
 | DONE | Top bar and bottom nav hidden on detail/nested screens (animated) |
 | DONE | Collapsible MediumTopAppBar on Movie/TV Show detail screens |
 | DONE | Duplicate LazyRow key crash fixed (itemsIndexed fallback) |
+| DONE | KMP migration: Hilt→Koin, Retrofit→Ktor, Room KMP, iOS targets, `core:tmdbApi` removed |
+| DONE | Version catalog cleaned (~30 unused entries removed) |
 | REMAINING | Delete dead `MainActivity.kt` (commented out in manifest) |
 | REMAINING | Delete stale NowInAndroid test files (12 files across 6 modules) |
 | REMAINING | Delete unused drawables (side_nav_bar.xml, ic_camera, ic_gallery, ic_slideshow, fading_snackbar_background) |
 | REMAINING | Delete unused `feature_foryou_ic_icon_placeholder.xml` across all features |
-| REMAINING | Clean up unused version catalog entries |
-| REMAINING | Rename `core/tmdbApi/old/` package |
+| DONE | Clean up unused version catalog entries |
+| DONE | Rename `core/tmdbApi/old/` package (deleted entirely) |
 
 ---
 

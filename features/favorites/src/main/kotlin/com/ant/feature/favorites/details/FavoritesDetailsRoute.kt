@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.material3.Text
 import androidx.compose.ui.unit.dp
 
@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 fun FavoritesDetailsRoute(
     id: String,
     modifier: Modifier = Modifier,
-    viewModel: FavoritesDetailsViewModel = hiltViewModel(),
+    viewModel: FavoritesDetailsViewModel = koinViewModel(),
 ) {
     val movie = "Movie Title"
 

@@ -1,26 +1,24 @@
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+
 plugins {
-    alias(libs.plugins.popular.movies.android.library)
-    alias(libs.plugins.popular.movies.hilt)
+    alias(libs.plugins.popular.movies.kmp.library)
 }
 
+kotlin {
+    targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
+        .configureEach {
+            namespace = "com.ant.common"
+        }
 
-android {
-    // Add this line
-    namespace  = "com.ant.common"
-}
+    sourceSets {
+        commonMain.dependencies {
+            implementation(project(":core:models"))
+            api(libs.koin.core)
+            implementation(libs.kermit)
+        }
 
-dependencies {
-    implementation(project(":core:models"))
-    implementation(libs.retrofit)
-
-    //navigation
-    implementation(libs.timber)
-
-    // Dagger - Hilt
-//    implementation(libs.hilt.android)
-//    ksp(libs.hilt.compiler)
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+        androidMain.dependencies {
+            implementation(libs.timber)
+        }
+    }
 }

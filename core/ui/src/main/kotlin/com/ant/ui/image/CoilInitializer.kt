@@ -5,13 +5,11 @@ import coil.Coil
 import coil.ImageLoader
 import coil.annotation.ExperimentalCoilApi
 import com.ant.common.di.Initializer
-import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.OkHttpClient
-import javax.inject.Inject
 
 @OptIn(ExperimentalCoilApi::class)
-class CoilInitializer @Inject constructor(
-    @ApplicationContext private val context: Context,
+class CoilInitializer(
+    private val context: Context,
     private val okHttpClient: OkHttpClient,
     private val tmdbImageCoilInterceptor: TmdbImageCoilInterceptor,
 ) : Initializer {

@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.gms)
     alias(libs.plugins.popular.movies.android.lint)
     alias(libs.plugins.popular.movies.android.config)
-    alias(libs.plugins.popular.movies.hilt)
 }
 
 android {
@@ -30,9 +29,10 @@ dependencies {
     implementation(project(":core:resources"))
     implementation(project(":core:domain"))
     implementation(project(":core:data"))
+    implementation(project(":core:database"))
     implementation(project(":core:analytics"))
-    implementation(project(":core:tmdbApi"))
     implementation(project(":core:datastore"))
+    implementation(project(":core:network"))
 
     // features
     implementation(project(":features:movies"))
@@ -56,7 +56,6 @@ dependencies {
     implementation(libs.androidx.compose.material3.adaptive.navigation)
     implementation(libs.navigation.compose)
     implementation(libs.androidx.compose.material3.adaptive.navigationSuite)
-    implementation(libs.androidx.hilt.navigation.compose)
 
     // Tooling and preview
     implementation(libs.androidx.compose.ui.tooling.preview)
@@ -66,13 +65,14 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.runtime.compose)
 
-    // Dagger - Hilt
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+    // Koin
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+    implementation(libs.koin.compose.viewmodel)
+    implementation(libs.koin.compose.viewmodel.navigation)
 
-    // okhttp client
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.logging)
+    // Ktor OkHttp engine (transitive via core:network)
+    implementation(libs.ktor.client.okhttp)
 
     // firebase
     implementation(libs.firebase.analytics)
@@ -83,6 +83,12 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.data.store)
     implementation(libs.data.store.preferences)
+
+    // OkHttp for Coil
+    implementation(libs.okhttp)
+
+    // Room
+    implementation(libs.room.runtime)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

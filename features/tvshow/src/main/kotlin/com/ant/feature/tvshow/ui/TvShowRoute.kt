@@ -3,7 +3,7 @@ package com.ant.feature.tvshow.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ant.feature.tvshow.TvShowViewModel
 import com.ant.models.request.TvShowType
@@ -16,7 +16,7 @@ fun TvShowRoute(
     onNavigateToDetails: (tvShowId: Long) -> Unit,
     onNavigateToCategory: (TvShowType) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TvShowViewModel = hiltViewModel(),
+    viewModel: TvShowViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

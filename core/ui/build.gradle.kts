@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.popular.movies.android.library)
     alias(libs.plugins.popular.movies.android.library.compose)
-    alias(libs.plugins.popular.movies.hilt)
 }
 
 android {
@@ -12,7 +11,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:resources"))
     implementation(project(":core:models"))
-    implementation(project(":core:tmdbApi"))
+    implementation(project(":core:network"))
 
     // Coil compose
     implementation(libs.coil.kt.compose)

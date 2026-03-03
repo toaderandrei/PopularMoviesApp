@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ant.feature.login.welcome.WelcomeViewModel
 
@@ -13,7 +13,7 @@ fun WelcomeRoute(
     onNavigateToLogin: () -> Unit,
     onGuestModeActivated: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: WelcomeViewModel = hiltViewModel(),
+    viewModel: WelcomeViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

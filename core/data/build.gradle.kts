@@ -1,20 +1,21 @@
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+
 plugins {
-    alias(libs.plugins.popular.movies.android.library)
-    alias(libs.plugins.popular.movies.hilt)
+    alias(libs.plugins.popular.movies.kmp.library)
 }
 
-android {
-    namespace = "com.ant.data"
-}
+kotlin {
+    targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
+        .configureEach {
+            namespace = "com.ant.data"
+        }
 
-dependencies {
-    implementation(project(":core:domain"))
-    implementation(project(":core:models"))
-    implementation(project(":core:network"))
-    implementation(project(":core:tmdbApi"))
-    implementation(project(":core:database"))
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    sourceSets {
+        commonMain.dependencies {
+            implementation(project(":core:domain"))
+            implementation(project(":core:models"))
+            implementation(project(":core:network"))
+            implementation(project(":core:database"))
+        }
+    }
 }

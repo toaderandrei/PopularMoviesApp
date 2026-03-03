@@ -1,16 +1,19 @@
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+
 plugins {
-    alias(libs.plugins.popular.movies.android.library)
+    alias(libs.plugins.popular.movies.kmp.library)
 }
 
-android {
-    namespace  = "com.ant.models"
-}
+kotlin {
+    targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
+        .configureEach {
+            namespace = "com.ant.models"
+        }
 
-dependencies {
-    implementation(libs.kotlinSerialization)
-    implementation(libs.kotlinx.coroutines.core)
-
-    implementation(libs.kotlin.stdlib)
-
-    testImplementation(libs.junit)
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.kotlinSerialization)
+            implementation(libs.kotlinx.datetime)
+        }
+    }
 }

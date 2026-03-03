@@ -3,9 +3,8 @@ package com.ant.app.application
 import com.ant.app.BuildConfig
 import com.ant.common.di.Initializer
 import com.ant.common.logger.TmdbLogger
-import javax.inject.Inject
 
-class TimberInitializer @Inject constructor(
+class TimberInitializer(
     private val tmdbLogger: TmdbLogger
 ) : Initializer {
     override fun init() {

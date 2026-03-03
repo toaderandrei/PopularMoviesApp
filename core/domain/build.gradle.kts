@@ -1,13 +1,19 @@
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+
 plugins {
-    alias(libs.plugins.popular.movies.android.library)
-    alias(libs.plugins.popular.movies.hilt)
+    alias(libs.plugins.popular.movies.kmp.library)
 }
 
-android {
-    namespace  = "com.ant.domain"
-}
+kotlin {
+    targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
+        .configureEach {
+            namespace = "com.ant.domain"
+        }
 
-dependencies {
-    implementation(project(":core:models"))
-    implementation(project(":core:common"))
+    sourceSets {
+        commonMain.dependencies {
+            implementation(project(":core:models"))
+            implementation(project(":core:common"))
+        }
+    }
 }

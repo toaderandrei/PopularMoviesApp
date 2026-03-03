@@ -8,11 +8,13 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
         with(target) {
             pluginManager.apply {
                 apply("popular.movies.android.library")
-                apply("popular.movies.hilt")
             }
 
             dependencies {
-                add("implementation", libs.findLibrary("androidx.hilt.navigation.compose").get())
+                add("implementation", libs.findLibrary("koin.android").get())
+                add("implementation", libs.findLibrary("koin.compose").get())
+                add("implementation", libs.findLibrary("koin.compose.viewmodel").get())
+                add("implementation", libs.findLibrary("koin.compose.viewmodel.navigation").get())
                 add("implementation", libs.findLibrary("androidx.lifecycle.runtime.compose").get())
                 add("implementation", libs.findLibrary("androidx.lifecycle.viewmodel.compose").get())
             }

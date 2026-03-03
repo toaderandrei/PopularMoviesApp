@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.popular.movies.android.feature)
     alias(libs.plugins.popular.movies.android.library.compose)
-    alias(libs.plugins.popular.movies.hilt)
 }
 
 android {
@@ -21,7 +20,6 @@ dependencies {
     // Libraries
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.accompanist.adaptive)

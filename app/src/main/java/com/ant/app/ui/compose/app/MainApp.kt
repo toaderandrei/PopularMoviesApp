@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -70,7 +70,7 @@ import com.ant.resources.R as R2
 @Composable
 fun MainApp(
     navController: NavHostController = rememberNavController(),
-    mainActivityViewModel: MainActivityViewModel = hiltViewModel()
+    mainActivityViewModel: MainActivityViewModel = koinViewModel()
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val authenticationState by mainActivityViewModel.isUserLoggedIn.collectAsStateWithLifecycle()
