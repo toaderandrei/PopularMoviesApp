@@ -1,25 +1,47 @@
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+import org.jetbrains.compose.ExperimentalComposeLibrary
+
 plugins {
-    alias(libs.plugins.popular.movies.android.library)
-    alias(libs.plugins.popular.movies.android.library.compose)
+    alias(libs.plugins.popular.movies.kmp.library)
+    alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.compose)
 }
 
-android {
-    namespace = "com.ant.ui"
-}
+kotlin {
+    targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
+        .configureEach {
+            namespace = "com.ant.ui"
+        }
 
-dependencies {
-    implementation(project(":core:models"))
-    implementation(project(":core:resources"))
+    sourceSets {
+        commonMain.dependencies {
+            implementation(project(":core:models"))
+            implementation(project(":core:shared-ui"))
 
-    // Coil compose
-    implementation(libs.coil.kt.compose)
+            // Compose Multiplatform
+            implementation(compose.runtime)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.materialIconsExtended)
+            implementation(compose.ui)
+            implementation(compose.components.uiToolingPreview)
+            implementation(compose.components.resources)
 
-    implementation(libs.coreKtx)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material.icons)
-    implementation(libs.androidx.compose.ui)
+            // Coil 3 for Compose Multiplatform
+            implementation(libs.coil.kt.compose)
+            implementation(libs.coil.network.ktor)
+        }
 
-    // Tooling and preview
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    debugImplementation(libs.androidx.compose.ui.tooling)
+        androidMain.dependencies {
+            // Android-specific dependencies (keep old resources for now for backwards compat)
+            implementation(project(":core:resources"))
+            implementation(libs.androidx.compose.ui.tooling.preview)
+        }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            @OptIn(ExperimentalComposeLibrary::class)
+            implementation(compose.uiTest)
+        }
+    }
 }

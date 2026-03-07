@@ -1,6 +1,6 @@
 package com.ant.domain.usecases.login
 
-import com.ant.common.logger.Logger
+import com.ant.shared.logger.Logger
 import com.ant.domain.usecases.resultFlow
 import com.ant.models.model.Result
 import com.ant.models.model.UserData

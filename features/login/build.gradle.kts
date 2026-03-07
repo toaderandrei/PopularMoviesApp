@@ -10,7 +10,7 @@ android {
 dependencies {
     // Projects
     implementation(project(":core:analytics"))
-    implementation(project(":core:common"))
+    implementation(project(":core:shared"))
     implementation(project(":core:ui"))
     implementation(project(":core:models"))
     implementation(project(":core:domain"))

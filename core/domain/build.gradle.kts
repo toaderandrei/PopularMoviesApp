@@ -13,7 +13,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":core:models"))
-            implementation(project(":core:common"))
+            implementation(project(":core:shared"))
         }
         val androidHostTest by getting {
             dependencies {

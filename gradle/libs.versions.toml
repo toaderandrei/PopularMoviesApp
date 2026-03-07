@@ -22,8 +22,9 @@ timber = "5.0.1"
 openSourceLicensesPlugin = "0.10.10"
 openSourceLicensesLibrary = "17.4.0"
 material = "1.13.0"
-coil = "2.7.0"
+coil = "3.4.0"
 kotlin = "2.3.10"
+composeMultiplatform = "1.10.1"
 appcompat = "1.7.1"
 androidx-window = "1.5.1"
 androidx-navigation = "2.9.7"
@@ -112,9 +113,10 @@ appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat"
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
 androidx-compose-material3-navigationSuite = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite", version.ref = "androidxComposeMaterial3AdaptiveNavigationSuite" }
 
-# coil
-coil = { module = "io.coil-kt:coil", version.ref = "coil" }
-coil-kt-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+# coil (Compose Multiplatform - Coil 3)
+coil = { module = "io.coil-kt.coil3:coil-core", version.ref = "coil" }
+coil-kt-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 
 # kotlin stdlib
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
@@ -186,6 +188,7 @@ room = { id = "androidx.room", version.ref = "room" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 ben-manes-versions = { id = "com.github.ben-manes.versions", version.ref = "benManesVersions" }
 
 # Custom plugins

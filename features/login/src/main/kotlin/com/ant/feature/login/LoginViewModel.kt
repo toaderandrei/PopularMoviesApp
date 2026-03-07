@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ant.analytics.AnalyticsEvent
 import com.ant.analytics.AnalyticsHelper
 import com.ant.analytics.CrashlyticsHelper
-import com.ant.common.logger.TmdbLogger
+import com.ant.shared.logger.TmdbLogger
 import com.ant.domain.usecases.login.LoginUserAndSaveSessionUseCase
 import com.ant.feature.login.state.LoginState
 import com.ant.models.model.fold

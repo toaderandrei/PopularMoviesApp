@@ -12,7 +12,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":core:common"))
+            implementation(project(":core:shared"))
             implementation(project(":core:models"))
             implementation(libs.data.store.preferences)
         }

@@ -17,8 +17,8 @@ import com.ant.app.BuildConfig
 import com.ant.app.application.AppInitializers
 import com.ant.app.application.TimberInitializer
 import com.ant.app.ui.compose.app.viewmodel.MainActivityViewModel
-import com.ant.common.logger.Logger
-import com.ant.common.logger.TmdbLogger
+import com.ant.shared.logger.Logger
+import com.ant.shared.logger.TmdbLogger
 import com.ant.data.repositories.DefaultAuthRepository
 import com.ant.data.repositories.DefaultFavoriteRepository
 import com.ant.data.repositories.DefaultMovieRepository

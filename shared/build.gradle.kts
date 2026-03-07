@@ -20,7 +20,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(project(":core:models"))
-            api(project(":core:common"))
+            api(project(":core:shared"))
+            api(project(":core:shared-ui"))
             api(project(":core:domain"))
             api(project(":core:data"))
             api(project(":core:network"))

@@ -19,7 +19,7 @@ kotlin {
             }
         }
         commonMain.dependencies {
-            api(project(":core:common"))
+            api(project(":core:shared"))
             implementation(project(":core:models"))
 
             implementation(libs.kotlinx.datetime)

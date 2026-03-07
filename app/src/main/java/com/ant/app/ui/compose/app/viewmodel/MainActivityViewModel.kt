@@ -2,7 +2,7 @@ package com.ant.app.ui.compose.app.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ant.common.logger.TmdbLogger
+import com.ant.shared.logger.TmdbLogger
 import com.ant.models.session.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -23,7 +23,7 @@ android {
 
 dependencies {
     // module dependency
-    implementation(project(":core:common"))
+    implementation(project(":core:shared"))
     implementation(project(":core:models"))
     implementation(project(":core:ui"))
     implementation(project(":core:resources"))
