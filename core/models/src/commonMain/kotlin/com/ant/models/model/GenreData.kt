@@ -1,0 +1,25 @@
+package com.ant.models.model
+
+/**
+ * Enumerates supported movie/TV show genres with their TMDb string identifiers.
+ */
+enum class GenreData(val genreValue: String) {
+    DRAMA("drama"),
+    FANTASY("fantasy"),
+    SCIENCE_FICTION("science-fiction"),
+    ACTION("action"),
+    ADVENTURE("adventure"),
+    CRIME("crime"),
+    THRILLER("thriller"),
+    COMEDY("comedy"),
+    HORROR("horror"),
+    MYSTERY("mystery");
+
+    companion object {
+        private val values by lazy { values() }
+        /**
+         * Finds the [GenreData] matching the given string value, or null if no match.
+         */
+        fun fromValue(value: String) = values.firstOrNull { it.genreValue == value }
+    }
+}

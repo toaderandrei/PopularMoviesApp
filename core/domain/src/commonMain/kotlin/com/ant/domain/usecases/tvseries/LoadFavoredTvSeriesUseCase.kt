@@ -1,0 +1,23 @@
+package com.ant.domain.usecases.tvseries
+
+import com.ant.domain.repositories.TvSeriesRepository
+import com.ant.domain.usecases.resultFlow
+import com.ant.models.entities.TvShow
+import com.ant.models.model.Result
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+
+/**
+ * Loads TV series from local storage filtered by favorite status.
+ */
+class LoadFavoredTvSeriesUseCase constructor(
+    private val tvSeriesRepository: TvSeriesRepository,
+    private val dispatcher: CoroutineDispatcher,
+) {
+    /** @param parameters true to load favored TV series, false for non-favored. */
+    operator fun invoke(parameters: Boolean): Flow<Result<List<TvShow>>> {
+        return resultFlow(dispatcher) {
+            tvSeriesRepository.getFavoredTvSeries(parameters)
+        }
+    }
+}
