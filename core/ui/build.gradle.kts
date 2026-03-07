@@ -8,14 +8,11 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:resources"))
     implementation(project(":core:models"))
-    implementation(project(":core:network"))
+    implementation(project(":core:resources"))
 
     // Coil compose
     implementation(libs.coil.kt.compose)
-    implementation(libs.coil)
 
     implementation(libs.coreKtx)
     implementation(libs.androidx.compose.material3)
