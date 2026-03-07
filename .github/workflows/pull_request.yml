@@ -12,6 +12,7 @@ concurrency:
 env:
   TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
   ANDROID_SDK_ROOT: /opt/android-sdk
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2"
 
 jobs:
   lint:
