@@ -48,8 +48,8 @@ import com.ant.feature.login.account.AccountRoute
 import com.ant.feature.login.navigation.LOGIN_ROUTE
 import com.ant.feature.login.navigation.loginScreen
 import com.ant.feature.login.navigation.navigateToLogin
-import com.ant.feature.login.welcome.navigation.WELCOME_ROUTE
-import com.ant.feature.login.welcome.navigation.welcomeScreen
+import com.ant.feature.welcome.navigation.WELCOME_ROUTE
+import com.ant.feature.welcome.navigation.welcomeScreen
 import com.ant.feature.movies.navigation.movieCategoryScreen
 import com.ant.feature.movies.navigation.movieDetailsScreen
 import com.ant.feature.movies.navigation.moviesScreen

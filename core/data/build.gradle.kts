@@ -17,5 +17,11 @@ kotlin {
             implementation(project(":core:network"))
             implementation(project(":core:database"))
         }
+        val androidHostTest by getting {
+            dependencies {
+                implementation(libs.mockK)
+                implementation(libs.turbine)
+            }
+        }
     }
 }

@@ -15,5 +15,11 @@ kotlin {
             implementation(project(":core:models"))
             implementation(project(":core:common"))
         }
+        val androidHostTest by getting {
+            dependencies {
+                implementation(libs.mockK)
+                implementation(libs.turbine)
+            }
+        }
     }
 }

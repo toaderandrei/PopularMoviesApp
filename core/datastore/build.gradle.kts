@@ -16,5 +16,12 @@ kotlin {
             implementation(project(":core:models"))
             implementation(libs.data.store.preferences)
         }
+
+        val androidHostTest by getting {
+            dependencies {
+                implementation(libs.mockK)
+                implementation(libs.turbine)
+            }
+        }
     }
 }

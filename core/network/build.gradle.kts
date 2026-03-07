@@ -12,6 +12,12 @@ kotlin {
         }
 
     sourceSets {
+        val androidHostTest by getting {
+            dependencies {
+                implementation(libs.mockK)
+                implementation(libs.turbine)
+            }
+        }
         commonMain.dependencies {
             api(project(":core:common"))
             implementation(project(":core:models"))

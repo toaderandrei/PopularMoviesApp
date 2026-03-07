@@ -40,6 +40,7 @@ dependencies {
     implementation(project(":features:favorites"))
     implementation(project(":features:search"))
     implementation(project(":features:login"))
+    implementation(project(":features:welcome"))
 
     // UI libs
     implementation(libs.coreKtx)

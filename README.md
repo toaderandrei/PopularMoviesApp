@@ -35,7 +35,7 @@ This Kotlin Multiplatform (KMP) application showcases popular movies and TV seri
 
 The project follows **Clean Architecture** with clear separation of concerns, organized into feature modules and core modules.
 
-For detailed architecture documentation, see [`documentation/ARCHITECTURE.md`](documentation/ARCHITECTURE.md).
+For detailed architecture documentation, see [`documentation/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 https://developer.android.com/topic/architecture
 

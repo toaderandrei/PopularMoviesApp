@@ -23,6 +23,7 @@ include(":features:tvshow")
 include(":features:favorites")
 include(":features:search")
 include(":features:login")
+include(":features:welcome")
 
 // core
 include(":core:ui")

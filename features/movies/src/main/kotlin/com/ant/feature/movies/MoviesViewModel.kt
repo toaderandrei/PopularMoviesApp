@@ -81,7 +81,7 @@ class MoviesViewModel constructor(
                             val updatedSections = currentState.movieSections.toMutableMap()
                             updatedSections[category] = MovieSection(
                                 category = category,
-                                movies = result.data,
+                                movies = result.data.items,
                                 isLoading = false
                             )
                             currentState.copy(
