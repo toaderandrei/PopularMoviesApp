@@ -29,10 +29,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ant.feature.tvshow.category.TvShowCategoryUiState
-import com.ant.feature.tvshow.ui.components.TvShowCard
+import com.ant.ui.components.TvShowCard
 import com.ant.models.entities.TvShow
 import com.ant.models.request.TvShowType
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -53,7 +54,10 @@ fun TvShowCategoryScreen(
             TopAppBar(
                 title = { Text(text = categoryTitle(uiState.categoryType)) },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.testTag("tvshow_category_back"),
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -74,7 +78,9 @@ fun TvShowCategoryScreen(
             when {
                 uiState.isLoading -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .testTag("tvshow_category_loading"),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
@@ -83,7 +89,9 @@ fun TvShowCategoryScreen(
 
                 uiState.error != null && uiState.tvShows.isEmpty() -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .testTag("tvshow_category_error"),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = uiState.error)
@@ -92,7 +100,9 @@ fun TvShowCategoryScreen(
 
                 uiState.tvShows.isEmpty() -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .testTag("tvshow_category_empty"),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = "No TV shows found")
@@ -125,6 +135,7 @@ fun TvShowCategoryScreen(
                         contentPadding = PaddingValues(16.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.testTag("tvshow_category_grid"),
                     ) {
                         items(items = uiState.tvShows, key = { it.id }) { tvShow ->
                             TvShowCard(

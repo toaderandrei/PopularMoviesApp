@@ -1,0 +1,41 @@
+pluginManagement {
+    includeBuild("build-logic")
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "Popular-Movies"
+// ui
+include(":app")
+
+// features
+include(":features:movies")
+include(":features:tvshow")
+include(":features:favorites")
+include(":features:search")
+include(":features:login")
+include(":features:welcome")
+
+// core
+include(":core:ui")
+include(":core:resources")
+include(":core:domain")
+include(":core:common")
+include(":core:network")
+include(":core:models")
+include(":core:analytics")
+include(":core:database")
+include(":core:data")
+include(":core:datastore")
+
+// shared KMP module (exports iOS framework)
+include(":shared")

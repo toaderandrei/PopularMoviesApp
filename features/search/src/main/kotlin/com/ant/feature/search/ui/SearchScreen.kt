@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,6 +35,10 @@ import androidx.compose.ui.unit.dp
 import com.ant.feature.search.SearchTab
 import com.ant.feature.search.SearchUiState
 import com.ant.models.entities.MovieData
+import com.ant.ui.components.ErrorState
+import com.ant.ui.components.LoadingState
+import com.ant.ui.components.MovieCard
+import com.ant.ui.components.TvShowCard
 import com.ant.resources.R as R2
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -151,7 +154,7 @@ fun SearchScreen(
                                             key = { uiState.movieResults[it].id },
                                         ) { index ->
                                             val movie = uiState.movieResults[index]
-                                            com.ant.feature.movies.ui.components.MovieCard(
+                                            MovieCard(
                                                 movie = movie,
                                                 onClick = { onMovieClick(movie.id) },
                                             )
@@ -179,7 +182,7 @@ fun SearchScreen(
                                             key = { uiState.tvShowResults[it].id },
                                         ) { index ->
                                             val tvShow = uiState.tvShowResults[index]
-                                            com.ant.feature.tvshow.ui.components.TvShowCard(
+                                            TvShowCard(
                                                 tvShow = tvShow,
                                                 onClick = { onTvShowClick(tvShow.id) },
                                             )
@@ -206,34 +209,6 @@ fun SearchScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun LoadingState(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center,
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun ErrorState(
-    error: String,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier.padding(16.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            text = error,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.error,
-            textAlign = TextAlign.Center,
-        )
     }
 }
 

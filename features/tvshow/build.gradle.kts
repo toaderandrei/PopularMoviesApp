@@ -5,6 +5,10 @@ plugins {
 
 android {
     namespace = "com.ant.feature.tvshow"
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -18,4 +22,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.accompanist.permissions)
     implementation(libs.coil.kt.compose)
+
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.compose.ui.test)
+    testImplementation(libs.androidx.compose.ui.testManifest)
 }

@@ -3,7 +3,7 @@ package com.ant.feature.movies.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ant.feature.movies.MoviesViewModel
 import com.ant.models.request.MovieType
@@ -16,7 +16,7 @@ fun MoviesRoute(
     onNavigateToDetails: (movieId: Long) -> Unit,
     onNavigateToCategory: (MovieType) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MoviesViewModel = hiltViewModel(),
+    viewModel: MoviesViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

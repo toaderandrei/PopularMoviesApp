@@ -7,16 +7,14 @@ import com.ant.domain.usecases.tvseries.TvShowListUseCase
 import com.ant.models.model.Result
 import com.ant.models.request.TvShowType
 import com.ant.models.request.RequestType
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class TvShowViewModel @Inject constructor(
+
+class TvShowViewModel constructor(
     private val savedStateHandle: SavedStateHandle,
     private val tvShowListUseCase: TvShowListUseCase,
 ) : ViewModel() {

@@ -4,16 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ant.common.logger.TmdbLogger
 import com.ant.models.session.SessionManager
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class MainActivityViewModel @Inject constructor(
+
+class MainActivityViewModel constructor(
     logger: TmdbLogger,
     sessionManager: SessionManager,
 ) : ViewModel() {

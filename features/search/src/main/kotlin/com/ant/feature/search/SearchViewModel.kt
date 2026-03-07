@@ -6,7 +6,6 @@ import com.ant.domain.usecases.search.SearchMovieUseCase
 import com.ant.domain.usecases.search.SearchTvShowUseCase
 import com.ant.models.model.Result
 import com.ant.models.request.RequestType
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,11 +15,10 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
-@HiltViewModel
-class SearchViewModel @Inject constructor(
+
+class SearchViewModel constructor(
     private val searchMovieUseCase: SearchMovieUseCase,
     private val searchTvShowUseCase: SearchTvShowUseCase,
 ) : ViewModel() {

@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ant.models.entities.MovieData
 import com.ant.models.request.MovieType
+import com.ant.ui.components.MoviePosterCard
 
 /**
  * A horizontal scrolling row of movies with a section header

@@ -29,10 +29,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ant.feature.movies.category.MovieCategoryUiState
-import com.ant.feature.movies.ui.components.MovieCard
+import com.ant.ui.components.MovieCard
 import com.ant.models.entities.MovieData
 import com.ant.models.request.MovieType
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -53,7 +54,10 @@ fun MovieCategoryScreen(
             TopAppBar(
                 title = { Text(text = categoryTitle(uiState.categoryType)) },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.testTag("movie_category_back"),
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -74,7 +78,9 @@ fun MovieCategoryScreen(
             when {
                 uiState.isLoading -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .testTag("movie_category_loading"),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
@@ -83,7 +89,9 @@ fun MovieCategoryScreen(
 
                 uiState.error != null && uiState.movies.isEmpty() -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .testTag("movie_category_error"),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = uiState.error)
@@ -92,7 +100,9 @@ fun MovieCategoryScreen(
 
                 uiState.movies.isEmpty() -> {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .testTag("movie_category_empty"),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = "No movies found")
@@ -125,6 +135,7 @@ fun MovieCategoryScreen(
                         contentPadding = PaddingValues(16.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.testTag("movie_category_grid"),
                     ) {
                         items(items = uiState.movies, key = { it.id }) { movie ->
                             MovieCard(

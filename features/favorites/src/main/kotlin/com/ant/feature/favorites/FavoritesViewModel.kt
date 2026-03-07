@@ -8,17 +8,15 @@ import com.ant.domain.usecases.movies.LoadFavoredMoviesUseCase
 import com.ant.domain.usecases.tvseries.LoadFavoredTvSeriesUseCase
 import com.ant.models.model.Result
 import com.ant.models.request.FavoriteType
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
-import javax.inject.Inject
 
-@HiltViewModel
-class FavoritesViewModel @Inject constructor(
+
+class FavoritesViewModel constructor(
     private val savedStateHandle: SavedStateHandle,
     private val loadFavoredMoviesUseCase: LoadFavoredMoviesUseCase,
     private val loadFavoredTvSeriesUseCase: LoadFavoredTvSeriesUseCase,

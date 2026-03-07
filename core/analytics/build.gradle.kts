@@ -1,27 +1,18 @@
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+
 plugins {
-    alias(libs.plugins.popular.movies.android.library)
-    alias(libs.plugins.popular.movies.hilt)
+    alias(libs.plugins.popular.movies.kmp.library)
 }
 
-android {
-    // Add this line
-    namespace  = "com.ant.analytics"
-}
-
-dependencies {
-    implementation(project(":core:models"))
-    implementation(project(":core:common"))
-
-    // Dagger - Hilt
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
-
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
-    implementation(libs.firebase.crashlytics)
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+kotlin {
+    targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
+        .configureEach {
+            namespace = "com.ant.analytics"
+        }
+    sourceSets {
+        commonMain.dependencies {
+            implementation(project(":core:models"))
+            implementation(project(":core:common"))
+        }
+    }
 }

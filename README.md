@@ -1,6 +1,6 @@
 # Popular Movies App
 
-This Kotlin-based Android application showcases popular movies and TV series using modern Android development practices. Built entirely with **Jetpack Compose** and **Material 3**, it follows the **MVVM pattern** and **Clean Architecture** principles.
+This Kotlin Multiplatform (KMP) application showcases popular movies and TV series using modern Android development practices. Built entirely with **Jetpack Compose** and **Material 3**, it follows the **MVVM pattern** and **Clean Architecture** principles with iOS target support.
 
 ## Table of Contents
 - [Features](#features)
@@ -35,7 +35,7 @@ This Kotlin-based Android application showcases popular movies and TV series usi
 
 The project follows **Clean Architecture** with clear separation of concerns, organized into feature modules and core modules.
 
-For detailed architecture documentation, see [`documentation/ARCHITECTURE.md`](documentation/ARCHITECTURE.md).
+For detailed architecture documentation, see [`documentation/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 https://developer.android.com/topic/architecture
 
@@ -58,21 +58,22 @@ core/
   domain/                      # Use cases (business logic)
   data/                        # Repository implementations
   models/                      # Data models and entities
-  database/                    # Room database
-  network/                     # Network layer, data sources
-  tmdbApi/                     # TMDb API client
+  database/                    # Room KMP database
+  network/                     # Ktor-based network layer, data sources
   datastore/                   # DataStore preferences (session, guest mode)
-  common/                      # Shared utilities, dispatcher qualifiers
+  common/                      # Shared utilities, Koin DI, dispatcher qualifiers
   ui/                          # Shared UI components, navigation destinations
   resources/                   # Shared strings, drawables
   analytics/                   # Firebase Analytics/Crashlytics
+
+shared/                         # KMP shared framework (iOS)
 ```
 
 ### Key Patterns
 
 - **Route/Screen separation** -- Route composables inject ViewModels, Screen composables are pure UI
 - **`resultFlow()`** -- Centralized use case helper that wraps suspend blocks in `Loading/Success/Error` states
-- **Dispatcher injection** -- Hilt qualifiers (`@IoDispatcher`, `@DefaultDispatcher`, `@ApplicationScope`) for testable coroutine code
+- **Dispatcher injection** -- Koin named qualifiers (`named(IO_DISPATCHER)`, `named(DEFAULT_DISPATCHER)`, `named(APP_SCOPE)`) for testable coroutine code
 - **StateFlow + `.update{}`** -- Thread-safe UI state management in all ViewModels
 - **Convention plugins** -- Shared Gradle build logic via `build-logic/` (based on [Square's approach](https://developer.squareup.com/blog/herding-elephants/) and [idiomatic Gradle](https://github.com/jjohannes/idiomatic-gradle))
 
@@ -90,26 +91,28 @@ User Interaction → Route (collectAsStateWithLifecycle)
 <img src="pictures/popular_movies_2.jpg" alt="popular_movies_2" width="300"/> <img src="pictures/popular_movies_1.jpg" alt="popular_movies_1" width="200"/> <img src="pictures/popular_movies_3.jpg" alt="popular_movies_3" width="200"/>
 
 ## Technologies Used
-- **Language:** Kotlin 2.1+
-- **UI:** Jetpack Compose, Material 3
+- **Language:** Kotlin 2.3+
+- **UI:** Jetpack Compose, Material 3, Kotlin Multiplatform (KMP)
 - **Architecture:** MVVM + Clean Architecture
 - **Async:** Kotlin Coroutines, Flow, StateFlow
-- **DI:** Hilt (Dagger) with KSP
-- **Networking:** Retrofit + OkHttp
-- **Persistence:** Room, DataStore
+- **DI:** Koin
+- **Networking:** Ktor Client
+- **Persistence:** Room KMP, DataStore KMP
 - **Image Loading:** Coil (Compose integration)
 - **Navigation:** Compose Navigation
 - **Analytics:** Firebase Analytics, Crashlytics
+- **Multiplatform:** iOS targets (iosArm64, iosX64, iosSimulatorArm64)
 
 ## Libraries Used
 - [Jetpack Compose](https://developer.android.com/jetpack/compose): Modern declarative UI toolkit for Android
-- [Retrofit](https://square.github.io/retrofit/): A type-safe HTTP client for Android and Java
+- [Ktor](https://ktor.io/): Multiplatform asynchronous HTTP client
 - [Coil](https://github.com/coil-kt/coil): An image loading library for Android backed by Kotlin Coroutines
-- [Hilt](https://developer.android.com/training/dependency-injection/hilt-android): Dependency injection library that reduces boilerplate
-- [Room](https://developer.android.com/training/data-storage/room): Persistence library providing an abstraction layer over SQLite
+- [Koin](https://insert-koin.io/): Lightweight multiplatform dependency injection framework
+- [Room KMP](https://developer.android.com/training/data-storage/room): Persistence library providing an abstraction layer over SQLite
 - [DataStore](https://developer.android.com/topic/libraries/architecture/datastore): Data storage solution for key-value pairs
 - [Navigation Compose](https://developer.android.com/jetpack/compose/navigation): Navigation framework for Compose
 - [MockK](https://mockk.io/ANDROID.html): A mocking library for Kotlin
+- [Kermit](https://github.com/touchlab/Kermit): Multiplatform logging library
 
 ## Installation
 1. Clone the repository:
@@ -139,7 +142,7 @@ Contributions are welcome! Please fork, create a feature branch, commit changes,
 ## License
 MIT License
 
-(c) 2024 Andrei Toader-Stanescu
+(c) 2026 Andrei Toader-Stanescu
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

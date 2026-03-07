@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ant.models.entities.TvShow
 import com.ant.models.request.TvShowType
+import com.ant.ui.components.TvShowPosterCard
 
 /**
  * A horizontal scrolling row of TV shows with a section header

@@ -1,17 +1,23 @@
 package com.ant.app.application
 
 import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
+import com.ant.app.di.allKoinModules
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
 
-@HiltAndroidApp
 class PopularMoviesApp : Application() {
 
-    @Inject
-    lateinit var initializers: AppInitializers
+    private val initializers: AppInitializers by inject()
 
     override fun onCreate() {
         super.onCreate()
+        startKoin {
+            androidLogger()
+            androidContext(this@PopularMoviesApp)
+            modules(allKoinModules)
+        }
         initializers.init()
     }
 }

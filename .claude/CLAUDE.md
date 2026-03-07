@@ -2,9 +2,51 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Working Preferences
+
+### Before Writing Code
+- Explain clearly what and why
+- If it is a new topic, do a deep dive, preferably use architect mode to deep dive
+- Always document existing findings, current solution
+- Never write code without my approval
+
+### Writing Code
+- All code should be testable
+- Use SOLID principles as much as possible
+- Use Android guidelines when writing code
+- For Gradle always look at build-logic folder for inspiration or for updating existing plugins
+- Tests should always start with "Should"
+- If tests are repeatable try to use Parameterized tests
+- If tests need data that is reusable in other tests, try to either use a TestData class and if it doesn't exist, try to create it
+
+### Issue/Task Context
+
+To get information on the task you're working on, use the Notion MCP tool (mention this should be installed if not found).
+Search for the Notion issue related to this branch by filtering the EngTask database on the branch name.
+Always fetch this information if you're asked to "Work on this branch" / "Work on this task".
+
+### Merge Requests
+
+For description use this format:
+
+#### Problem
+- Explain the problem in detail with reproduction steps
+
+#### Implementation
+- Explain the solution in detail and why it was chosen and how it fixes the problem.
+
+##### Code Changes
+- Explain code change in detail and why it was done. Do not get into details of the implementation, show the classes involved and the changes made.
+
+#### Testing
+- Explain how the solution was tested.
+
+#### Demo
+- If possible, add a video of the solution working.
+
 ## Project Overview
 
-Popular Movies is a Kotlin-based Android application that showcases popular movies and TV series using The Movie Database (TMDb) API. The app follows Clean Architecture principles with MVVM pattern and is organized into feature modules.
+Popular Movies is a Kotlin Multiplatform (KMP) application that showcases popular movies and TV series using The Movie Database (TMDb) API. The app follows Clean Architecture principles with MVVM pattern and is organized into feature modules, with iOS target support.
 
 ## Architecture
 
@@ -41,15 +83,15 @@ The project follows Clean Architecture with clear separation of concerns:
 - **core**: Shared infrastructure and business logic
   - `core:domain` - Use cases (business logic orchestration)
   - `core:data` - Repository implementations
-  - `core:database` - Room database for local persistence
-  - `core:network` - Network layer configuration
-  - `core:tmdbApi` - TMDb API client interfaces
-  - `core:datastore` - DataStore for preferences/settings
-  - `core:models` - Data models and DTOs
-  - `core:common` - Shared utilities, dispatcher qualifiers, DI modules
+  - `core:database` - Room KMP database, entity classes (`entity/`), entity-domain mappers (`mapper/`)
+  - `core:network` - Ktor-based network layer, data sources, mappers
+  - `core:datastore` - DataStore KMP for preferences/settings
+  - `core:models` - Pure Kotlin domain models and DTOs (no Room annotations)
+  - `core:common` - Shared utilities, Koin DI, dispatcher qualifiers
   - `core:ui` - Shared UI components, navigation destinations
   - `core:resources` - Shared resources (strings, drawables, etc.)
   - `core:analytics` - Analytics/Firebase integration
+  - `shared` - KMP shared framework (iOS export)
 
 - **build-logic**: Gradle convention plugins for consistent build configuration
   - Uses composite builds pattern (included build)
@@ -62,16 +104,17 @@ The project follows Clean Architecture with clear separation of concerns:
    - `resultFlow(dispatcher)` wraps execution in Loading/Success/Error states with `flowOn`
    - Properly rethrows `CancellationException` for structured concurrency
 3. **Data Layer** (Repositories) → Handles data sources (remote/local)
-   - Concrete `@Singleton` classes with `suspend fun performRequest()`
+   - Plain classes with `suspend fun performRequest()`
    - Coordinates between network (TMDb API), database (Room), and DataStore
 
 ### Key Patterns
 
 - **Result Wrapper**: All use cases return `Flow<Result<T>>` where Result is Loading, Success, or Error
 - **Repository Pattern**: Single responsibility repositories (e.g., `LoadMovieListRepository`, `SaveMovieDetailsToLocalRepository`)
-- **Dependency Injection**: Hilt for DI throughout all layers
-- **Coroutine Dispatchers**: Injected via qualifiers (`@IoDispatcher`, `@DefaultDispatcher`, `@MainDispatcher`, `@MainImmediateDispatcher`)
-- **Application Scope**: `@ApplicationScope CoroutineScope` with `SupervisorJob()` for app-level work (provided by `CoroutinesModule`)
+- **Entity-Domain Mapping**: Room entities in `core:database/entity/` map to/from domain models via `toDomain()`/`toEntity()` extension functions in `core:database/mapper/EntityMappers.kt`. Mapping happens at the repository boundary in `core:data`.
+- **Dependency Injection**: Koin for DI throughout all layers
+- **Coroutine Dispatchers**: Injected via Koin named qualifiers (`named(IO_DISPATCHER)`, `named(DEFAULT_DISPATCHER)`, `named(MAIN_DISPATCHER)`)
+- **Application Scope**: `named(APP_SCOPE) CoroutineScope` with `SupervisorJob()` for app-level work
 - **UI State Pattern**: Each feature has a dedicated `UiState` data class managed by ViewModel via `MutableStateFlow` + `.asStateFlow()`
 - **Route/Screen Separation**:
   - **Route composables** inject ViewModels and collect state (e.g., `MoviesRoute`)
@@ -90,6 +133,9 @@ The project follows Clean Architecture with clear separation of concerns:
 
 # Run all tests
 ./gradlew test
+
+# Run single test
+./gradlew :module:test --tests "TestClass.testMethod"
 
 # Run connected (instrumented) tests on device/emulator
 ./gradlew connectedAndroidTest
@@ -113,7 +159,7 @@ The project uses convention plugins defined in `build-logic/convention/`:
 - `popular.movies.android.application.compose` - Adds Compose dependencies
 - `popular.movies.android.library.compose` - Compose for library modules
 - `popular.movies.android.feature` - Feature module conventions
-- `popular.movies.hilt` - Hilt dependency injection setup
+- `popular.movies.kmp.library` - KMP library module configuration
 - `popular.movies.android.room` - Room database configuration
 - `popular.movies.android.firebase` - Firebase integration
 - `popular.movies.android.lint` - Lint configuration
@@ -142,17 +188,19 @@ Dependencies are managed in `gradle/libs.versions.toml` using Gradle version cat
 
 ## Technology Stack
 
-- **Language**: Kotlin 2.1+
-- **UI**: Jetpack Compose with Material 3 (all features migrated)
+- **Language**: Kotlin 2.3+
+- **UI**: Jetpack Compose with Material 3, Kotlin Multiplatform (KMP)
 - **Architecture**: MVVM + Clean Architecture
-- **DI**: Hilt (Dagger) with KSP
-- **Networking**: Retrofit + OkHttp + Kotlin Serialization
+- **DI**: Koin
+- **Networking**: Ktor Client + Kotlin Serialization
 - **Image Loading**: Coil (with Compose integration)
-- **Async**: Kotlin Coroutines + Flow (dispatchers injected via Hilt qualifiers)
-- **Database**: Room
-- **Preferences**: DataStore
+- **Async**: Kotlin Coroutines + Flow (dispatchers injected via Koin named qualifiers)
+- **Database**: Room KMP
+- **Preferences**: DataStore KMP
 - **Navigation**: Compose Navigation with Material 3 Adaptive Navigation Suite
 - **Firebase**: Analytics and Crashlytics
+- **Logging**: Timber (Android), Kermit (commonMain)
+- **Multiplatform**: iOS targets (iosArm64, iosX64, iosSimulatorArm64)
 - **Testing**: JUnit, MockK (infrastructure not yet set up)
 
 ## Module Dependencies
@@ -162,10 +210,10 @@ When adding new dependencies:
 1. Features depend on core modules (domain, data, models, ui, resources)
 2. Core modules have specific dependencies:
    - `core:domain` depends on `core:data`, `core:models` (Note: ideally domain should not depend on data -- see proposals)
-   - `core:data` depends on `core:domain`, `core:models`, `core:network`, `core:database`, `core:datastore`
-   - `core:common` provides dispatcher qualifiers, `@ApplicationScope`, and shared utilities
-   - `core:datastore` depends on `core:common` (for `@ApplicationScope` qualifier) and `core:models`
-   - `core:tmdbApi` is isolated for API definitions
+   - `core:data` depends on `core:domain`, `core:models`, `core:network`, `core:database`, `core:datastore` (uses `core:database` mappers for entity↔domain conversion)
+   - `core:database` depends on `core:models` (for domain types used in mappers and `VideoType` enum)
+   - `core:common` provides dispatcher qualifiers, `named(APP_SCOPE)`, Koin modules, and shared utilities
+   - `core:datastore` depends on `core:common` (for `named(APP_SCOPE)` qualifier) and `core:models`
 3. Avoid circular dependencies between features
 4. Keep feature modules independent from each other
 
@@ -187,6 +235,7 @@ Each feature defines its navigation in a dedicated `navigation/` package with:
 - Repositories: Suffixed with `Repository` (e.g., `LoadMovieListRepository`)
 - Route composables: Suffixed with `Route` (e.g., `MoviesRoute`)
 - Screen composables: Suffixed with `Screen` (e.g., `MoviesScreen`)
+- Always follow existing naming and formatting conventions in files
 
 ### Package Structure
 - Base package: `com.ant.<layer>.<feature>`
@@ -205,8 +254,8 @@ Each feature defines its navigation in a dedicated `navigation/` package with:
 
 ### Coroutine Best Practices
 - Always rethrow `CancellationException` in catch blocks
-- Use `@IoDispatcher` / `@DefaultDispatcher` qualifiers instead of hardcoding `Dispatchers.IO`
-- Use `@ApplicationScope` for app-level coroutine work (not ad-hoc `CoroutineScope()`)
+- Use `named(IO_DISPATCHER)` / `named(DEFAULT_DISPATCHER)` Koin qualifiers instead of hardcoding `Dispatchers.IO`
+- Use `named(APP_SCOPE)` for app-level coroutine work (not ad-hoc `CoroutineScope()`)
 - Use `flowOn(dispatcher)` in use cases, let ViewModels collect in `viewModelScope`
 
 ## Known Issues & Technical Debt
@@ -214,3 +263,7 @@ Each feature defines its navigation in a dedicated `navigation/` package with:
 See `.andrei/proposals/` for detailed review findings and prioritized fix plans.
 
 For architecture documentation, see `documentation/ARCHITECTURE.md`.
+
+
+## Reference code 
+- Check apps for references: /home/andrei29/workspace/workspace-android/reference-code

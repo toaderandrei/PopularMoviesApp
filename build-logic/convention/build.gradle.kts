@@ -68,13 +68,13 @@ gradlePlugin {
             id = "popular.movies.android.config"
             implementationClass = "AndroidBuildConfigPlugin"
         }
-        register("hilt") {
-            id = "popular.movies.hilt"
-            implementationClass = "HiltConventionPlugin"
-        }
         register("androidRoom") {
             id = "popular.movies.android.room"
             implementationClass = "AndroidRoomConventionPlugin"
+        }
+        register("kmpLibrary") {
+            id = "popular.movies.kmp.library"
+            implementationClass = "KmpLibraryConventionPlugin"
         }
 
     }

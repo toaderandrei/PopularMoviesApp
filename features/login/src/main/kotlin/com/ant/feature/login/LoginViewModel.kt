@@ -11,15 +11,13 @@ import com.ant.feature.login.state.LoginState
 import com.ant.models.model.fold
 import com.ant.models.request.RequestType
 import com.ant.models.session.SessionManager
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class LoginViewModel @Inject constructor(
+
+class LoginViewModel constructor(
     private val sessionManager: SessionManager,
     private val loginUserUseCase: LoginUserAndSaveSessionUseCase,
     private val analyticsHelper: AnalyticsHelper,

@@ -16,6 +16,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,8 @@ import com.ant.feature.movies.MoviesUiState
 import com.ant.feature.movies.ui.components.MovieSectionRow
 import com.ant.models.entities.MovieData
 import com.ant.models.request.MovieType
+import com.ant.ui.components.ErrorState
+import com.ant.ui.components.LoadingState
 
 /**
  * Movies screen - displays multiple sections of movies in vertical scroll
@@ -49,18 +52,18 @@ fun MoviesScreen(
     ) {
         when {
             uiState.isLoading && uiState.movieSections.isEmpty() -> {
-                LoadingState(modifier = Modifier.fillMaxSize())
+                LoadingState(modifier = Modifier.fillMaxSize().testTag("movies_loading"))
             }
 
             uiState.error != null && uiState.movieSections.isEmpty() -> {
                 ErrorState(
                     error = uiState.error,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize().testTag("movies_error")
                 )
             }
 
             uiState.movieSections.isEmpty() -> {
-                EmptyState(modifier = Modifier.fillMaxSize())
+                EmptyState(modifier = Modifier.fillMaxSize().testTag("movies_empty"))
             }
 
             else -> {
@@ -68,7 +71,7 @@ fun MoviesScreen(
                     sections = uiState.movieSections,
                     onMovieClick = onMovieClick,
                     onMoreClick = onMoreClick,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize().testTag("movies_sections")
                 )
             }
         }

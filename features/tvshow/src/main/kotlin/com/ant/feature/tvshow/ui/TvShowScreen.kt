@@ -16,6 +16,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,18 +49,18 @@ fun TvShowScreen(
     ) {
         when {
             uiState.isLoading && uiState.tvShowSections.isEmpty() -> {
-                LoadingState(modifier = Modifier.fillMaxSize())
+                LoadingState(modifier = Modifier.fillMaxSize().testTag("tvshow_loading"))
             }
 
             uiState.error != null && uiState.tvShowSections.isEmpty() -> {
                 ErrorState(
                     error = uiState.error,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize().testTag("tvshow_error")
                 )
             }
 
             uiState.tvShowSections.isEmpty() -> {
-                EmptyState(modifier = Modifier.fillMaxSize())
+                EmptyState(modifier = Modifier.fillMaxSize().testTag("tvshow_empty"))
             }
 
             else -> {
@@ -67,7 +68,7 @@ fun TvShowScreen(
                     sections = uiState.tvShowSections,
                     onTvShowClick = onTvShowClick,
                     onMoreClick = onMoreClick,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize().testTag("tvshow_sections")
                 )
             }
         }

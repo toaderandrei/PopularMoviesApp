@@ -9,17 +9,15 @@ import com.ant.domain.usecases.movies.SaveMovieDetailsUseCase
 import com.ant.models.model.Result
 import com.ant.models.request.MovieAppendToResponseItem
 import com.ant.models.request.RequestType
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class MovieDetailsViewModel @Inject constructor(
+
+class MovieDetailsViewModel constructor(
     private val savedStateHandle: SavedStateHandle,
     private val movieDetailsUseCase: MovieDetailsUseCase,
     private val saveMovieDetailsUseCase: SaveMovieDetailsUseCase,

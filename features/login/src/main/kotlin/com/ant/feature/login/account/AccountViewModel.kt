@@ -9,16 +9,14 @@ import com.ant.domain.usecases.login.LoadAccountProfileUseCase
 import com.ant.domain.usecases.login.LogoutUserAndClearSessionUseCase
 import com.ant.models.model.Result
 import com.ant.models.request.RequestType
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class AccountViewModel @Inject constructor(
+
+class AccountViewModel constructor(
     private val loadAccountProfileUseCase: LoadAccountProfileUseCase,
     private val logoutUseCase: LogoutUserAndClearSessionUseCase,
     private val analyticsHelper: AnalyticsHelper,

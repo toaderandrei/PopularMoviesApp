@@ -1,21 +1,25 @@
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 
 plugins {
-    alias(libs.plugins.popular.movies.android.library)
-    alias(libs.plugins.popular.movies.hilt)
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.popular.movies.kmp.library)
 }
 
-android {
-    namespace  = "com.ant.domain"
+kotlin {
+    targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
+        .configureEach {
+            namespace = "com.ant.domain"
+        }
 
-}
-
-dependencies {
-    implementation(project(":core:models"))
-    implementation(project(":core:common"))
-    implementation(project(":core:data"))
-
-    // Hilt
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.compiler)
+    sourceSets {
+        commonMain.dependencies {
+            implementation(project(":core:models"))
+            implementation(project(":core:common"))
+        }
+        val androidHostTest by getting {
+            dependencies {
+                implementation(libs.mockK)
+                implementation(libs.turbine)
+            }
+        }
+    }
 }

@@ -9,23 +9,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.ant.analytics.AnalyticsHelper
 import com.ant.app.ui.compose.app.MainApp
 import com.ant.app.ui.compose.app.component.MoviesTopAppBar
 import com.ant.app.ui.compose.app.rememberMainContentState
-import com.ant.common.logger.TmdbLogger
 import com.ant.design.theme.PopularMoviesTheme
 import com.ant.ui.navigation.MainScreenDestination
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class MainActivityCompose : ComponentActivity() {
-    @Inject
-    internal lateinit var logger: TmdbLogger
-
-    @Inject
-    internal lateinit var analyticsHelper: AnalyticsHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

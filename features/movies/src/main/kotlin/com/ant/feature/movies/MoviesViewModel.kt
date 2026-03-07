@@ -7,16 +7,14 @@ import com.ant.domain.usecases.movies.MovieListUseCase
 import com.ant.models.model.Result
 import com.ant.models.request.MovieType
 import com.ant.models.request.RequestType
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class MoviesViewModel @Inject constructor(
+
+class MoviesViewModel constructor(
     private val savedStateHandle: SavedStateHandle,
     private val movieListUseCase: MovieListUseCase,
 ) : ViewModel() {
