@@ -1,6 +1,7 @@
 package com.ant.ui
 
 import androidx.compose.ui.window.ComposeUIViewController
+import com.ant.shared.ui.app.MainApp
 import com.ant.ui.di.initKoinIos
 import platform.UIKit.UIViewController
 
@@ -23,6 +24,6 @@ fun MainViewController(): UIViewController {
     }
 
     return ComposeUIViewController {
-        App()
+        MainApp()
     }
 }
