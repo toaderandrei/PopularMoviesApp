@@ -1,5 +1,3 @@
-import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
@@ -13,18 +11,10 @@ plugins {
     alias(libs.plugins.jetbrains.compose) apply false
     alias(libs.plugins.ksp) apply false
 
+    // Dependency management
     alias(libs.plugins.ben.manes.versions)
-}
+    id("popular.movies.dependency.updates")
 
-tasks.withType<DependencyUpdatesTask> {
-    outputFormatter = "json"
-    rejectVersionIf {
-        val dominated = listOf("alpha", "beta", "rc", "cr", "m", "preview", "dev")
-        dominated.any { qualifier ->
-            candidate.version.lowercase().contains(qualifier)
-        }
-    }
+    // iOS development tasks
+    id("popular.movies.ios.tasks")
 }
-
-apply(from = "scripts/update-release-version.gradle.kts")
-apply(from = "scripts/update-dependencies.gradle.kts")

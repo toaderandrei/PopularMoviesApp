@@ -1,22 +1,12 @@
 import SwiftUI
 import Shared
 
-struct ContentView: View {
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("Popular Movies")
-                    .font(.largeTitle)
-                    .padding()
-                Text("Platform: \(PlatformKt.platformName())")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            .navigationTitle("Popular Movies")
-        }
+struct ContentView: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        return MainViewControllerKt.MainViewController()
     }
-}
 
-#Preview {
-    ContentView()
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        // No updates needed
+    }
 }

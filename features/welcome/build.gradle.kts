@@ -1,29 +1,30 @@
 plugins {
-    alias(libs.plugins.popular.movies.android.feature)
-    alias(libs.plugins.popular.movies.android.library.compose)
-}
-
-android {
-    namespace = "com.ant.feature.welcome"
-
-    testOptions {
-        unitTests.isIncludeAndroidResources = true
-    }
+    id("popular.movies.kmp.feature")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 dependencies {
-    implementation(project(":core:ui"))
-    implementation(project(":core:domain"))
-    implementation(project(":core:models"))
-    implementation(project(":core:resources"))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    implementation(libs.coil.kt.compose)
+    // Core dependencies
+    commonMainImplementation(projects.core.domain)
+    commonMainImplementation(projects.core.models)
 
-    testImplementation(libs.turbine)
-    testImplementation(libs.robolectric)
-    testImplementation(libs.androidx.compose.ui.test)
-    testImplementation(libs.androidx.compose.ui.testManifest)
+    // UI
+    commonMainImplementation(projects.core.ui)
+    commonMainImplementation(projects.core.resources)
+    commonMainImplementation(libs.coil.kt.compose)
+
+    // Serialization
+    commonMainImplementation(libs.kotlinSerialization)
+
+    // Android-specific UI
+    androidMainImplementation(platform(libs.androidx.compose.bom))
+    androidMainImplementation(libs.androidx.compose.ui.tooling.preview)
+
+    // Testing
+    commonTestImplementation(libs.turbine)
+    androidHostTestImplementation(libs.robolectric)
+    androidHostTestImplementation(libs.androidx.compose.ui.test)
+    androidHostTestImplementation(libs.androidx.compose.ui.testManifest)
+    androidHostTestImplementation(libs.mockK)
+    androidHostTestImplementation(libs.kotlinx.coroutines.test)
 }

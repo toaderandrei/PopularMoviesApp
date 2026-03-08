@@ -1,6 +1,6 @@
 package com.ant.network.datasource.movies
 
-import com.ant.shared.exceptions.withRetry
+import com.ant.common.exceptions.withRetry
 import com.ant.models.entities.MovieDetails
 import com.ant.models.request.MovieAppendToResponseItem
 import com.ant.models.request.RequestType

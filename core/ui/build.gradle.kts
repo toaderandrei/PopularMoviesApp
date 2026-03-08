@@ -1,47 +1,44 @@
-import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
-import org.jetbrains.compose.ExperimentalComposeLibrary
-
 plugins {
-    alias(libs.plugins.popular.movies.kmp.library)
+    id("popular.movies.kmp.library")
     alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
-kotlin {
-    targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
-        .configureEach {
-            namespace = "com.ant.ui"
-        }
+dependencies {
+    // Core dependencies
+    commonMainImplementation(projects.core.models)
+    commonMainImplementation(projects.core.common)
 
-    sourceSets {
-        commonMain.dependencies {
-            implementation(project(":core:models"))
-            implementation(project(":core:shared-ui"))
+    // Kotlin Serialization (for Navigation 3 routes)
+    commonMainImplementation(libs.kotlinSerialization)
 
-            // Compose Multiplatform
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.materialIconsExtended)
-            implementation(compose.ui)
-            implementation(compose.components.uiToolingPreview)
-            implementation(compose.components.resources)
+    // Navigation (for NavDestination in navigation components)
+    commonMainApi(libs.navigation.compose.multiplatform)
 
-            // Coil 3 for Compose Multiplatform
-            implementation(libs.coil.kt.compose)
-            implementation(libs.coil.network.ktor)
-        }
+    // Material3 Adaptive Navigation Suite (KMP)
+    commonMainApi(libs.compose.material3.adaptive.navigation.suite)
 
-        androidMain.dependencies {
-            // Android-specific dependencies (keep old resources for now for backwards compat)
-            implementation(project(":core:resources"))
-            implementation(libs.androidx.compose.ui.tooling.preview)
-        }
+    // Compose Multiplatform (exposed as API)
+    commonMainApi(compose.runtime)
+    commonMainApi(compose.foundation)
+    commonMainApi(compose.material3)
+    commonMainApi(compose.material)  // For Material basic components
+    commonMainApi(libs.compose.ui)
+    commonMainApi(libs.compose.ui.tooling.preview)
+    commonMainApi(compose.materialIconsExtended)  // Material Icons Extended (pinned to 1.7.3 in Compose 1.10.1)
 
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-            @OptIn(ExperimentalComposeLibrary::class)
-            implementation(compose.uiTest)
-        }
-    }
+    // Image loading
+    commonMainImplementation(libs.coil.kt.compose)
+    commonMainImplementation(libs.coil.network.ktor)
+
+    // Android-specific
+    androidMainImplementation(platform(libs.androidx.compose.bom))
+    androidMainImplementation(projects.core.resources)  // Backwards compat during migration
+    androidMainImplementation(libs.androidx.compose.ui.tooling.preview)
+
+    // Testing
+    commonTestImplementation(kotlin("test"))
+    // Compose UI tests only work on Android/JVM (JUnit4) - not available for iOS
+    // androidUnitTestImplementation(libs.compose.ui.test)
 }

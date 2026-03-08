@@ -20,11 +20,15 @@ tasks.withType<KotlinCompile>().configureEach {
 dependencies {
     compileOnly(libs.android.gradlePlugin)
     compileOnly(libs.compose.gradlePlugin)
+    compileOnly(libs.composeMultiplatform.gradlePlugin)
     compileOnly(libs.firebase.crashlytics.gradlePlugin)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.ksp.gradlePlugin)
     compileOnly(libs.room.gradlePlugin)
+    compileOnly(libs.ben.manes.versions.plugin)
 
+    // Test dependencies
+    testImplementation(libs.junit)
 }
 
 tasks {
@@ -76,6 +80,21 @@ gradlePlugin {
             id = "popular.movies.kmp.library"
             implementationClass = "KmpLibraryConventionPlugin"
         }
-
+        register("kmpFeature") {
+            id = "popular.movies.kmp.feature"
+            implementationClass = "KmpFeatureConventionPlugin"
+        }
+        register("kmpRoom") {
+            id = "popular.movies.kmp.room"
+            implementationClass = "KmpRoomConventionPlugin"
+        }
+        register("iosTasks") {
+            id = "popular.movies.ios.tasks"
+            implementationClass = "IosTasksPlugin"
+        }
+        register("dependencyUpdates") {
+            id = "popular.movies.dependency.updates"
+            implementationClass = "DependencyUpdatesConventionPlugin"
+        }
     }
 }

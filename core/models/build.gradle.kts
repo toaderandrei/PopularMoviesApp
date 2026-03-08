@@ -1,7 +1,7 @@
 import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 
 plugins {
-    alias(libs.plugins.popular.movies.kmp.library)
+    id("popular.movies.kmp.library")
 }
 
 kotlin {
@@ -13,7 +13,8 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinSerialization)
-            implementation(libs.kotlinx.datetime)
+            // Changed to api to allow iOS framework export
+            api(libs.kotlinx.datetime)
         }
     }
 }

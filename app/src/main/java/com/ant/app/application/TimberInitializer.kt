@@ -1,8 +1,8 @@
 package com.ant.app.application
 
 import com.ant.app.BuildConfig
-import com.ant.shared.di.Initializer
-import com.ant.shared.logger.TmdbLogger
+import com.ant.common.di.Initializer
+import com.ant.common.logger.TmdbLogger
 
 class TimberInitializer(
     private val tmdbLogger: TmdbLogger

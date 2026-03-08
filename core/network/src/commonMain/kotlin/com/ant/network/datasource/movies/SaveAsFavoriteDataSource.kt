@@ -1,6 +1,6 @@
 package com.ant.network.datasource.movies
 
-import com.ant.shared.logger.Logger
+import com.ant.common.logger.Logger
 import com.ant.models.request.FavoriteType
 import com.ant.models.request.RequestType
 import com.ant.network.api.TmdbAuthApi

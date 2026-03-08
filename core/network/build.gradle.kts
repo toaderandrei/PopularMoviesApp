@@ -1,16 +1,9 @@
-import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
-
 plugins {
-    alias(libs.plugins.popular.movies.kmp.library)
+    id("popular.movies.kmp.library")
     alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
-    targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
-        .configureEach {
-            namespace = "com.ant.network"
-        }
-
     sourceSets {
         val androidHostTest by getting {
             dependencies {
@@ -18,27 +11,30 @@ kotlin {
                 implementation(libs.turbine)
             }
         }
-        commonMain.dependencies {
-            api(project(":core:shared"))
-            implementation(project(":core:models"))
-
-            implementation(libs.kotlinx.datetime)
-            implementation(libs.kotlinSerialization)
-            implementation(libs.koin.core)
-
-            implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.content.negotiation)
-            implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.ktor.client.logging)
-        }
-
-        androidMain.dependencies {
-            implementation(libs.ktor.client.okhttp)
-            implementation(libs.okhttp)
-        }
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
     }
+}
+
+dependencies {
+    // Core dependencies
+    commonMainApi(projects.core.common)
+    commonMainImplementation(projects.core.models)
+
+    // Ktor Client (exposed as API for consuming modules)
+    commonMainApi(libs.ktor.client.core)
+    commonMainApi(libs.ktor.client.content.negotiation)
+    commonMainApi(libs.ktor.serialization.kotlinx.json)
+    commonMainApi(libs.ktor.client.logging)
+
+    // Utilities
+    commonMainApi(libs.kotlinx.datetime)  // For iOS framework export
+    commonMainImplementation(libs.kotlinSerialization)
+    commonMainImplementation(libs.koin.core)
+
+    // Platform-specific HTTP engines (Android)
+    androidMainImplementation(libs.ktor.client.okhttp)
+    androidMainImplementation(libs.okhttp)
 }

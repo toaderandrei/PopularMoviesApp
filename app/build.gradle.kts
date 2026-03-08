@@ -1,10 +1,12 @@
 plugins {
-    alias(libs.plugins.popular.movies.android.application)
-    alias(libs.plugins.popular.movies.android.application.compose)
-    alias(libs.plugins.popular.movies.android.firebase)
+    id("popular.movies.android.application")
+    id("popular.movies.android.application.compose")
+    id("popular.movies.android.firebase")
     alias(libs.plugins.gms)
-    alias(libs.plugins.popular.movies.android.lint)
-    alias(libs.plugins.popular.movies.android.config)
+    id("popular.movies.android.lint")
+    id("popular.movies.android.config")
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.jetbrains.compose)
 }
 
 android {
@@ -22,25 +24,11 @@ android {
 }
 
 dependencies {
-    // module dependency
-    implementation(project(":core:shared"))
-    implementation(project(":core:models"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:resources"))
-    implementation(project(":core:domain"))
-    implementation(project(":core:data"))
-    implementation(project(":core:database"))
-    implementation(project(":core:analytics"))
-    implementation(project(":core:datastore"))
-    implementation(project(":core:network"))
+    // UI umbrella dependency (includes infrastructure transitively via :shared)
+    implementation(projects.sharedUi)   // UI composition + infrastructure
 
-    // features
-    implementation(project(":features:movies"))
-    implementation(project(":features:tvshow"))
-    implementation(project(":features:favorites"))
-    implementation(project(":features:search"))
-    implementation(project(":features:login"))
-    implementation(project(":features:welcome"))
+    // Android-specific resources (for backwards compat)
+    implementation(projects.core.resources)
 
     // UI libs
     implementation(libs.coreKtx)
@@ -52,11 +40,13 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons)
     implementation(libs.androidx.compose.ui)
+    implementation(compose.components.resources)
 
     // Navigation compose
     implementation(libs.androidx.compose.material3.adaptive.navigation)
     implementation(libs.navigation.compose)
     implementation(libs.androidx.compose.material3.adaptive.navigationSuite)
+
 
     // Tooling and preview
     implementation(libs.androidx.compose.ui.tooling.preview)

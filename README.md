@@ -57,16 +57,17 @@ features/
 core/
   domain/                      # Use cases (business logic)
   data/                        # Repository implementations
-  models/                      # Data models and entities
-  database/                    # Room KMP database
+  models/                      # Pure Kotlin domain models and DTOs
+  database/                    # Room KMP database, entity classes, mappers
   network/                     # Ktor-based network layer, data sources
-  datastore/                   # DataStore preferences (session, guest mode)
-  common/                      # Shared utilities, Koin DI, dispatcher qualifiers
+  datastore/                   # DataStore KMP preferences (session, guest mode)
+  shared/                      # Shared utilities, Koin DI, dispatcher qualifiers
   ui/                          # Shared UI components, navigation destinations
-  resources/                   # Shared strings, drawables
+  resources/                   # Shared resources (strings, drawables, fonts)
   analytics/                   # Firebase Analytics/Crashlytics
 
-shared/                         # KMP shared framework (iOS)
+shared/                         # KMP framework for iOS export
+shared-ui/                      # Aggregates all features and UI for iOS
 ```
 
 ### Key Patterns
@@ -86,6 +87,111 @@ User Interaction → Route (collectAsStateWithLifecycle)
     → Flow<Result<T>> (Loading/Success/Error)
     → ViewModel (.update{}) → Route → Screen (pure UI)
 ```
+
+## Build System
+
+The project uses modern Gradle patterns with custom convention plugins for consistent configuration across all modules.
+
+### Gradle Features
+
+**Type-Safe Project Accessors**: Enabled for compile-time safe project dependencies
+```kotlin
+// Modern style (type-safe)
+implementation(projects.core.models)
+implementation(projects.features.movies)
+
+// Old style (deprecated)
+implementation(project(":core:models"))
+```
+
+**Dependencies Block Style**: All KMP modules use the modern `dependencies {}` block instead of `sourceSets`
+```kotlin
+dependencies {
+    // Core dependencies
+    commonMainImplementation(projects.core.models)
+    commonMainImplementation(projects.core.shared)
+
+    // UI
+    commonMainImplementation(projects.core.ui)
+    commonMainImplementation(libs.coil.kt.compose)
+
+    // Testing
+    commonTestImplementation(libs.turbine)
+}
+```
+
+**Auto-Configured Namespace**: Convention plugins automatically set namespace based on module path
+- `:features:movies` → `com.ant.features.movies`
+- `:core:database` → `com.ant.core.database`
+
+### Convention Plugins
+
+Custom Gradle convention plugins in `build-logic/convention/`:
+
+**Android Plugins:**
+- `popular.movies.android.application` - Android application configuration
+- `popular.movies.android.library` - Android library configuration
+- `popular.movies.android.application.compose` - Compose for app modules
+- `popular.movies.android.library.compose` - Compose for library modules
+- `popular.movies.android.feature` - Feature module conventions
+- `popular.movies.android.room` - Room database configuration
+- `popular.movies.android.firebase` - Firebase integration
+- `popular.movies.android.lint` - Lint configuration
+- `popular.movies.android.config` - Build config fields
+
+**KMP Plugins:**
+- `popular.movies.kmp.library` - KMP library module (auto-namespace, iOS targets)
+- `popular.movies.kmp.feature` - KMP feature module (auto-namespace, Compose, Koin)
+- `popular.movies.kmp.room` - Room KMP database (auto-KSP for all platforms)
+
+### Gradle Commands
+
+```bash
+# Build the app
+./gradlew assembleDebug
+
+# Build release APK
+./gradlew assembleRelease
+
+# Run all tests
+./gradlew test
+
+# Run single test
+./gradlew :module:test --tests "TestClass.testMethod"
+
+# Run connected (instrumented) tests
+./gradlew connectedAndroidTest
+
+# Clean build
+./gradlew clean
+
+# Lint check
+./gradlew lint
+
+# Check for dependency updates
+./gradlew dependencyUpdates
+```
+
+## Progress & Status
+
+### Completed Migrations
+- ✅ **XML to Compose UI** (100%) - All screens rebuilt with Jetpack Compose
+- ✅ **Fragment Navigation to Compose Navigation** - Fully migrated to declarative navigation
+- ✅ **Android-only to Kotlin Multiplatform** - iOS targets configured
+- ✅ **Type-Safe Project Accessors** - All modules using `projects.core.models` syntax
+- ✅ **Dependencies Block Modernization** - All KMP modules using `dependencies {}` style
+- ✅ **Auto-Configured Namespaces** - Convention plugins handle namespace automatically
+- ✅ **Room KMP Convention Plugin** - Centralized Room KSP configuration
+
+### Current Architecture
+- **Clean Architecture** with MVVM pattern
+- **Koin** for dependency injection
+- **Room KMP** for local database
+- **Ktor** for networking
+- **Compose Multiplatform** for UI
+- **Convention Plugins** for build configuration
+
+For detailed architecture and coding guidelines, see `.claude/CLAUDE.md`.
 
 ## Screenshots
 <img src="pictures/popular_movies_2.jpg" alt="popular_movies_2" width="300"/> <img src="pictures/popular_movies_1.jpg" alt="popular_movies_1" width="200"/> <img src="pictures/popular_movies_3.jpg" alt="popular_movies_3" width="200"/>

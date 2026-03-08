@@ -1,11 +1,11 @@
 package com.ant.app.application
 
 import android.app.Application
-import com.ant.app.di.allKoinModules
+import com.ant.app.di.appModule
+import com.ant.ui.di.initKoin
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
 
 class PopularMoviesApp : Application() {
 
@@ -13,10 +13,11 @@ class PopularMoviesApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        startKoin {
+
+        initKoin {
             androidLogger()
             androidContext(this@PopularMoviesApp)
-            modules(allKoinModules)
+            modules(appModule)  // Add app-specific module
         }
         initializers.init()
     }
