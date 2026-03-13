@@ -27,8 +27,7 @@ Organized using naming convention since GitHub doesn't support subfolders in wor
 
 | Workflow | File | Trigger | Description |
 |----------|------|---------|-------------|
-| Kotlin Lint | `lint-kotlin.yml` | PR/Push | Kotlin code style |
-| Android Lint | `lint-android.yml` | PR/Push | Android lint checks |
+| Android Lint | `lint-android.yml` | PR/Push | Android lint checks for Kotlin and XML |
 
 ## 🔧 Utility Workflows
 

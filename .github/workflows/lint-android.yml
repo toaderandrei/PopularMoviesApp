@@ -1,19 +1,21 @@
-name: Lint - Kotlin
+name: Lint - Android
 
 on:
   pull_request:
     paths:
       - '**/*.kt'
       - '**/*.kts'
+      - '**/*.xml'
   push:
     branches: [main]
     paths:
       - '**/*.kt'
       - '**/*.kts'
+      - '**/*.xml'
 
 jobs:
-  ktlint:
-    name: Kotlin Lint Check
+  lint:
+    name: Android Lint Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -28,12 +30,12 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Run ktlint
-        run: ./gradlew ktlintCheck
+      - name: Run Android Lint
+        run: ./gradlew lint
 
       - name: Upload Lint Results
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: ktlint-results
-          path: build/reports/ktlint/
+          name: lint-results
+          path: app/build/reports/lint-results*.html
