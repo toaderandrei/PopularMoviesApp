@@ -1,18 +1,12 @@
-import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
-
 plugins {
-    alias(libs.plugins.popular.movies.kmp.library)
+    id("popular.movies.kmp.library")
 }
 
-kotlin {
-    targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
-        .configureEach {
-            namespace = "com.ant.analytics"
-        }
-    sourceSets {
-        commonMain.dependencies {
-            implementation(project(":core:models"))
-            implementation(project(":core:common"))
-        }
-    }
+dependencies {
+    // Core dependencies
+    commonMainImplementation(projects.core.models)
+    commonMainImplementation(projects.core.common)
+
+    // Koin
+    commonMainApi(libs.koin.core)
 }

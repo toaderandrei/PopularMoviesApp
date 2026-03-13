@@ -1,32 +1,36 @@
-import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+import com.ant.popular.movies.ktx.configureIosFramework
 
 plugins {
-    alias(libs.plugins.popular.movies.kmp.library)
+    id("popular.movies.kmp.library")
+    alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.compose)
 }
 
 kotlin {
-    targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
-        .configureEach {
-            namespace = "com.ant.shared"
-        }
+    // iOS framework configuration - exports all modules for iOS
+    configureIosFramework(
+        baseName = "Shared",
+        exports = listOf(
+            projects.sharedUi,
+            projects.core.ui,
+            projects.core.resources  // Required for Compose resources to be bundled in iOS
+        )
+    )
+}
 
-    listOf(iosX64(), iosArm64(), iosSimulatorArm64()).forEach { target ->
-        target.binaries.framework {
-            baseName = "Shared"
-            isStatic = true
-        }
-    }
+dependencies {
+    // Core Infrastructure (exposed as API for iOS framework)
+    commonMainApi(projects.core.models)
+    commonMainApi(projects.core.common)
+    commonMainApi(projects.core.domain)
+    commonMainApi(projects.core.data)
+    commonMainApi(projects.core.network)
+    commonMainApi(projects.core.database)
+    commonMainApi(projects.core.datastore)
+    commonMainApi(projects.core.analytics)
 
-    sourceSets {
-        commonMain.dependencies {
-            api(project(":core:models"))
-            api(project(":core:common"))
-            api(project(":core:domain"))
-            api(project(":core:data"))
-            api(project(":core:network"))
-            api(project(":core:database"))
-            api(project(":core:datastore"))
-            api(project(":core:analytics"))
-        }
-    }
+    // UI modules (required for iOS framework export and resource bundling)
+    commonMainApi(projects.core.ui)
+    commonMainApi(projects.core.resources)
+    commonMainApi(projects.sharedUi)
 }

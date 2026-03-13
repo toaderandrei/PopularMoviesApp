@@ -1,9 +1,12 @@
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     includeBuild("build-logic")
     repositories {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 dependencyResolutionManagement {
@@ -11,31 +14,49 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 rootProject.name = "Popular-Movies"
-// ui
-include(":app")
 
-// features
-include(":features:movies")
-include(":features:tvshow")
-include(":features:favorites")
-include(":features:search")
-include(":features:login")
-include(":features:welcome")
+val repoRootDir: File = rootProject.projectDir
 
-// core
-include(":core:ui")
-include(":core:resources")
-include(":core:domain")
-include(":core:common")
-include(":core:network")
-include(":core:models")
-include(":core:analytics")
-include(":core:database")
-include(":core:data")
-include(":core:datastore")
+data class Project(
+    val dir: String,
+    val name: String = dir.split("/").last(),
+    val path: String = ":" + dir.replace("/", ":")
+)
 
-// shared KMP module (exports iOS framework)
-include(":shared")
+val projects = listOf(
+    // App
+    Project("app"),
+
+    // Features
+    Project("features/movies"),
+    Project("features/tvshow"),
+    Project("features/favorites"),
+    Project("features/search"),
+    Project("features/login"),
+    Project("features/welcome"),
+
+    // Core modules
+    Project("core/ui"),
+    Project("core/resources"),
+    Project("core/domain"),
+    Project("core/common"),
+    Project("core/network"),
+    Project("core/models"),
+    Project("core/analytics"),
+    Project("core/database"),
+    Project("core/data"),
+    Project("core/datastore"),
+
+    // Shared KMP modules (export iOS frameworks)
+    Project("shared"),
+    Project("shared-ui")
+)
+
+projects.forEach { project ->
+    include(project.path)
+    project(project.path).projectDir = repoRootDir.resolve(project.dir)
+}

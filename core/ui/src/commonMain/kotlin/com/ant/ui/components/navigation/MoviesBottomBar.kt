@@ -1,0 +1,40 @@
+package com.ant.ui.components.navigation
+
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination
+import com.ant.ui.navigation.MainScreenDestination
+
+@Composable
+fun MoviesBottomBar(
+    destinations: List<MainScreenDestination>,
+    onNavigateToDestination: (MainScreenDestination) -> Unit,
+    currentDestination: NavDestination?,
+    modifier: Modifier = Modifier
+) {
+    NavigationBar(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface
+    ) {
+        destinations.forEach { destination ->
+            val selected = currentDestination?.route?.contains(destination.name, true) == true
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
+                        contentDescription = destination.title
+                    )
+                },
+                label = { Text(destination.title) },
+                selected = selected,
+                onClick = { onNavigateToDestination(destination) }
+            )
+        }
+    }
+}

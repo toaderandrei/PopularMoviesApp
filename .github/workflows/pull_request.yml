@@ -53,7 +53,7 @@ jobs:
       - name: Run Lint
         run: ./gradlew lint
 
-  build:
+  buildAndroid:
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -92,8 +92,35 @@ jobs:
       - name: Assemble Debug
         run: ./gradlew assembleDebug --stacktrace
 
+  buildIos:
+    needs: lint
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle.kts', 'gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: gradle-${{ runner.os }}-
+
+      - name: Build iOS Frameworks
+        run: |
+          ./gradlew :shared:linkDebugFrameworkIosSimulatorArm64 --stacktrace
+          ./gradlew :shared:linkDebugFrameworkIosArm64 --stacktrace
+
   test:
-    needs: build
+    needs: [buildAndroid, buildIos]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

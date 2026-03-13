@@ -1,27 +1,34 @@
 plugins {
-    alias(libs.plugins.popular.movies.android.feature)
-    alias(libs.plugins.popular.movies.android.library.compose)
-}
-
-android {
-    namespace = "com.ant.feature.login"
+    id("popular.movies.kmp.feature")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 dependencies {
-    // Projects
-    implementation(project(":core:analytics"))
-    implementation(project(":core:common"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:models"))
-    implementation(project(":core:domain"))
-    implementation(project(":core:resources"))
-    implementation(project(":core:datastore"))
+    // Core dependencies
+    commonMainImplementation(projects.core.common)
+    commonMainImplementation(projects.core.domain)
+    commonMainImplementation(projects.core.models)
+    commonMainImplementation(projects.core.datastore)
+    commonMainImplementation(projects.core.analytics)
 
-    // Libraries
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    implementation(libs.accompanist.adaptive)
-    implementation(libs.coil.kt.compose)
+    // UI
+    commonMainImplementation(projects.core.ui)
+    commonMainImplementation(projects.core.resources)
+    commonMainImplementation(libs.coil.kt.compose)
+
+    // Serialization
+    commonMainImplementation(libs.kotlinSerialization)
+
+    // Android-specific UI
+    androidMainImplementation(platform(libs.androidx.compose.bom))
+    androidMainImplementation(libs.androidx.compose.ui.tooling.preview)
+    androidMainImplementation(libs.accompanist.adaptive)
+
+    // Testing
+    commonTestImplementation(libs.turbine)
+    androidHostTestImplementation(libs.robolectric)
+    androidHostTestImplementation(libs.androidx.compose.ui.test)
+    androidHostTestImplementation(libs.androidx.compose.ui.testManifest)
+    androidHostTestImplementation(libs.mockK)
+    androidHostTestImplementation(libs.kotlinx.coroutines.test)
 }

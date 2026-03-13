@@ -1,22 +1,10 @@
-import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 
 plugins {
-    alias(libs.plugins.popular.movies.kmp.library)
+    id("popular.movies.kmp.library")
 }
 
 kotlin {
-    targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
-        .configureEach {
-            namespace = "com.ant.datastore"
-        }
-
     sourceSets {
-        commonMain.dependencies {
-            implementation(project(":core:common"))
-            implementation(project(":core:models"))
-            implementation(libs.data.store.preferences)
-        }
-
         val androidHostTest by getting {
             dependencies {
                 implementation(libs.mockK)
@@ -24,4 +12,18 @@ kotlin {
             }
         }
     }
+}
+
+dependencies {
+    // Core dependencies
+    commonMainImplementation(projects.core.common)
+    commonMainImplementation(projects.core.models)
+
+    // DataStore (exposed as API for consumers to create DataStore instances)
+    commonMainApi(libs.data.store.preferences)
+
+    androidMainApi(libs.koin.android)
+    commonMainApi(libs.koin.core)
+    // Koin for Android (needed for androidContext() in DatastoreModule.android.kt)
+    androidMainImplementation(libs.koin.android)
 }

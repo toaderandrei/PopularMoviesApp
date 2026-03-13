@@ -87,15 +87,19 @@ The project follows Clean Architecture with clear separation of concerns:
   - `core:network` - Ktor-based network layer, data sources, mappers
   - `core:datastore` - DataStore KMP for preferences/settings
   - `core:models` - Pure Kotlin domain models and DTOs (no Room annotations)
-  - `core:common` - Shared utilities, Koin DI, dispatcher qualifiers
+  - `core:shared` - Shared utilities, Koin DI, dispatcher qualifiers (previously `core:common`)
   - `core:ui` - Shared UI components, navigation destinations
   - `core:resources` - Shared resources (strings, drawables, etc.)
   - `core:analytics` - Analytics/Firebase integration
-  - `shared` - KMP shared framework (iOS export)
+
+- **shared**: KMP framework modules for iOS export
+  - `shared` - iOS framework that exports all core infrastructure
+  - `shared-ui` - Aggregates all features and UI for iOS
 
 - **build-logic**: Gradle convention plugins for consistent build configuration
   - Uses composite builds pattern (included build)
   - Custom convention plugins define common configurations across modules
+  - **Auto-configured namespace**: All modules automatically get namespace based on path
 
 ### Data Flow Pattern
 
@@ -121,6 +125,48 @@ The project follows Clean Architecture with clear separation of concerns:
   - **Screen composables** are pure UI functions receiving state and callbacks (e.g., `MoviesScreen`)
 
 ## Build System
+
+### Gradle Modernization (2026-03)
+
+The project uses modern Gradle patterns:
+
+✅ **Type-Safe Project Accessors**: Enabled in `settings.gradle.kts`
+```kotlin
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+```
+
+✅ **Dependencies Block Style**: All modules use `dependencies {}` instead of `sourceSets`
+```kotlin
+dependencies {
+    // Core dependencies
+    commonMainImplementation(projects.core.models)
+    commonMainImplementation(projects.core.shared)
+
+    // UI
+    commonMainImplementation(projects.core.ui)
+
+    // Android-specific
+    androidMainImplementation(platform(libs.androidx.compose.bom))
+}
+```
+
+✅ **Auto-Configured Namespace**: Convention plugins automatically set namespace based on module path
+- `:features:movies` → `com.ant.features.movies`
+- `:core:database` → `com.ant.core.database`
+
+✅ **Organized Dependencies**: Group by category with comments
+```kotlin
+dependencies {
+    // Core dependencies
+    ...
+
+    // UI
+    ...
+
+    // Testing
+    ...
+}
+```
 
 ### Gradle Commands
 
@@ -154,22 +200,43 @@ The project follows Clean Architecture with clear separation of concerns:
 
 The project uses convention plugins defined in `build-logic/convention/`:
 
+**Android Plugins:**
 - `popular.movies.android.application` - Configures Android application modules
 - `popular.movies.android.library` - Configures Android library modules
 - `popular.movies.android.application.compose` - Adds Compose dependencies
 - `popular.movies.android.library.compose` - Compose for library modules
 - `popular.movies.android.feature` - Feature module conventions
-- `popular.movies.kmp.library` - KMP library module configuration
 - `popular.movies.android.room` - Room database configuration
 - `popular.movies.android.firebase` - Firebase integration
 - `popular.movies.android.lint` - Lint configuration
 - `popular.movies.android.config` - Build config fields
+
+**KMP Plugins:**
+- `popular.movies.kmp.library` - KMP library module configuration (auto-configures namespace, iOS targets)
+- `popular.movies.kmp.feature` - KMP feature module conventions (auto-configures namespace, Compose, Koin)
+- `popular.movies.kmp.room` - Room database for KMP (auto-configures KSP for all platforms)
+
+**Key Features:**
+- **Auto-namespace**: All modules get namespace automatically based on path
+- **Auto-iOS targets**: KMP plugins automatically configure `iosX64`, `iosArm64`, `iosSimulatorArm64`
+- **Auto-Room KSP**: Room plugin configures KSP processors for Android + all iOS targets
 
 When modifying build configuration, update the convention plugins rather than individual module build files.
 
 ### Version Catalog
 
 Dependencies are managed in `gradle/libs.versions.toml` using Gradle version catalogs. This centralizes dependency versions across all modules.
+
+**Type-Safe Access Examples:**
+```kotlin
+// Project dependencies (type-safe accessors)
+implementation(projects.core.models)
+implementation(projects.features.movies)
+
+// Library dependencies (version catalog)
+implementation(libs.koin.core)
+implementation(libs.coil.kt.compose)
+```
 
 ## Configuration
 
@@ -193,29 +260,49 @@ Dependencies are managed in `gradle/libs.versions.toml` using Gradle version cat
 - **Architecture**: MVVM + Clean Architecture
 - **DI**: Koin
 - **Networking**: Ktor Client + Kotlin Serialization
-- **Image Loading**: Coil (with Compose integration)
+- **Image Loading**: Coil 3 (KMP-compatible)
 - **Async**: Kotlin Coroutines + Flow (dispatchers injected via Koin named qualifiers)
 - **Database**: Room KMP
 - **Preferences**: DataStore KMP
-- **Navigation**: Compose Navigation with Material 3 Adaptive Navigation Suite
+- **Navigation**: Compose Navigation (JetBrains Multiplatform) with Material 3 Adaptive Navigation Suite
 - **Firebase**: Analytics and Crashlytics
 - **Logging**: Timber (Android), Kermit (commonMain)
 - **Multiplatform**: iOS targets (iosArm64, iosX64, iosSimulatorArm64)
-- **Testing**: JUnit, MockK (infrastructure not yet set up)
+- **Testing**: JUnit, MockK, Turbine, Robolectric
 
 ## Module Dependencies
 
 When adding new dependencies:
 
-1. Features depend on core modules (domain, data, models, ui, resources)
-2. Core modules have specific dependencies:
-   - `core:domain` depends on `core:data`, `core:models` (Note: ideally domain should not depend on data -- see proposals)
-   - `core:data` depends on `core:domain`, `core:models`, `core:network`, `core:database`, `core:datastore` (uses `core:database` mappers for entity↔domain conversion)
-   - `core:database` depends on `core:models` (for domain types used in mappers and `VideoType` enum)
-   - `core:common` provides dispatcher qualifiers, `named(APP_SCOPE)`, Koin modules, and shared utilities
-   - `core:datastore` depends on `core:common` (for `named(APP_SCOPE)` qualifier) and `core:models`
-3. Avoid circular dependencies between features
-4. Keep feature modules independent from each other
+1. Use **type-safe project accessors**: `projects.core.models` instead of `project(":core:models")`
+2. Use **dependencies block style** with organized groups (see Gradle Modernization above)
+3. Features depend on core modules (domain, models, ui, resources)
+4. Core modules have specific dependencies:
+   - `core:domain` depends on `core:models`, `core:shared`
+   - `core:data` depends on `core:domain`, `core:models`, `core:network`, `core:database`
+   - `core:database` depends on `core:models` (for domain types used in mappers)
+   - `core:shared` provides dispatcher qualifiers, `named(APP_SCOPE)`, Koin modules, and shared utilities
+   - `core:datastore` depends on `core:shared` and `core:models`
+5. Avoid circular dependencies between features
+6. Keep feature modules independent from each other
+
+**Example Feature Module Dependencies:**
+```kotlin
+dependencies {
+    // Core dependencies
+    commonMainImplementation(projects.core.shared)
+    commonMainImplementation(projects.core.domain)
+    commonMainImplementation(projects.core.models)
+
+    // UI
+    commonMainImplementation(projects.core.ui)
+    commonMainImplementation(projects.core.resources)
+
+    // Libraries
+    commonMainImplementation(libs.coil.kt.compose)
+    commonMainImplementation(libs.kotlinSerialization)
+}
+```
 
 ## Navigation
 
@@ -258,12 +345,32 @@ Each feature defines its navigation in a dedicated `navigation/` package with:
 - Use `named(APP_SCOPE)` for app-level coroutine work (not ad-hoc `CoroutineScope()`)
 - Use `flowOn(dispatcher)` in use cases, let ViewModels collect in `viewModelScope`
 
-## Known Issues & Technical Debt
+### Gradle Best Practices
+- Use type-safe project accessors (`projects.core.models`) for all project dependencies
+- Organize dependencies into logical groups with comments
+- Use `dependencies {}` block style, not `sourceSets {}`
+- Let convention plugins handle namespace configuration (don't set it manually)
+- For Room KMP modules, use `popular.movies.kmp.room` plugin
 
-See `.andrei/proposals/` for detailed review findings and prioritized fix plans.
+## Progress & Status
 
-For architecture documentation, see `documentation/ARCHITECTURE.md`.
+### ✅ Completed Migrations
+- XML to Compose UI migration (100%)
+- Fragment-based navigation to Compose Navigation
+- Android-only to Kotlin Multiplatform
+- Type-safe project accessors
+- Dependencies block style modernization
+- Auto-configured namespaces via convention plugins
+- Room KMP convention plugin
 
+### 🚧 Current Architecture
+- Clean Architecture with MVVM
+- Koin for dependency injection
+- Room KMP for local database
+- Ktor for networking
+- Compose Multiplatform for UI
 
-## Reference code 
+For detailed architecture documentation, see `docs/kmp_architecture.md`.
+
+## Reference Code
 - Check apps for references: /home/andrei29/workspace/workspace-android/reference-code

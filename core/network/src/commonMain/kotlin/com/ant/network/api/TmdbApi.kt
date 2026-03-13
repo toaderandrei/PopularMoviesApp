@@ -93,4 +93,10 @@ interface TmdbAuthApi {
 
     /** Marks or unmarks a media item as favorite on the user's TMDb account. */
     suspend fun markAsFavorite(accountId: Int, sessionId: String, mediaType: String, mediaId: Int, favorite: Boolean): StatusResponseDto
+
+    /** Fetches favorite movies from the user's TMDb account. */
+    suspend fun getFavoriteMovies(accountId: Int, sessionId: String, page: Int = 1): MovieResultsPageDto
+
+    /** Fetches favorite TV shows from the user's TMDb account. */
+    suspend fun getFavoriteTvShows(accountId: Int, sessionId: String, page: Int = 1): TvShowResultsPageDto
 }

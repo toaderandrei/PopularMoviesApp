@@ -1,21 +1,33 @@
 plugins {
-    alias(libs.plugins.popular.movies.android.feature)
-    alias(libs.plugins.popular.movies.android.library.compose)
+    id("popular.movies.kmp.feature")
+    alias(libs.plugins.kotlin.serialization)
 }
 
-android {
-    namespace = "com.ant.feature.favorites"
-}
+// Note: Test dependencies moved to androidHostTestImplementation below for consistency with other modules
 
 dependencies {
-    implementation(project(":core:ui"))
-    implementation(project(":core:domain"))
-    implementation(project(":core:models"))
-    implementation(project(":core:resources"))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material.icons)
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    implementation(libs.accompanist.permissions)
+    // Core dependencies
+    commonMainImplementation(projects.core.common)
+    commonMainImplementation(projects.core.domain)
+    commonMainImplementation(projects.core.models)
+
+    // UI
+    commonMainImplementation(projects.core.ui)
+    commonMainImplementation(projects.core.resources)
+    commonMainImplementation(libs.coil.kt.compose)
+
+    // Serialization
+    commonMainImplementation(libs.kotlinSerialization)
+
+    // Android-specific UI
+    androidMainImplementation(platform(libs.androidx.compose.bom))
+    androidMainImplementation(libs.androidx.compose.ui.tooling.preview)
+    androidMainImplementation(libs.androidx.compose.material.icons)
+
+    // Testing (consistent with other feature modules)
+    androidHostTestImplementation(libs.robolectric)
+    androidHostTestImplementation(libs.androidx.compose.ui.test)
+    androidHostTestImplementation(libs.androidx.compose.ui.testManifest)
+    androidHostTestImplementation(libs.mockK)
+    androidHostTestImplementation(libs.kotlinx.coroutines.test)
 }

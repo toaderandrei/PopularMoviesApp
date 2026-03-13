@@ -1,29 +1,34 @@
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
+
 plugins {
-    alias(libs.plugins.popular.movies.android.library)
-    alias(libs.plugins.popular.movies.android.library.compose)
-}
-android {
-    namespace  = "com.ant.resources"
+    id("popular.movies.kmp.library")
+    alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.compose)
 }
 
-dependencies {
-    // UI libs
-    implementation(libs.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material3.adaptive)
+kotlin {
+    targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
+        .configureEach {
+            namespace = "com.ant.resources"
 
-    // compose
-    api(libs.androidx.compose.foundation)
-    api(libs.androidx.compose.foundation.layout)
-    api(libs.androidx.compose.material.iconsExtended)
-    api(libs.androidx.compose.material3)
-    api(libs.androidx.compose.material3.adaptive)
-    api(libs.androidx.compose.material3.navigationSuite)
-    api(libs.androidx.compose.runtime)
+            // Enable Android resources in KMP project (required for Compose Resources packaging)
+            @Suppress("OPT_IN_USAGE")
+            experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
+        }
 
-    // tests
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    sourceSets {
+        commonMain.dependencies {
+            // Compose Runtime (required by Compose compiler)
+            implementation(compose.runtime)
+            // Compose Multiplatform Resources
+            // Note: UI dependencies (material3, icons) should be in core:ui or feature modules
+            api(compose.components.resources)
+        }
+    }
+}
+
+// Configure Compose Multiplatform Resources
+compose.resources {
+    packageOfResClass = "com.ant.resources"
+    publicResClass = true
 }
