@@ -26,7 +26,7 @@ class AndroidBuildConfigPlugin : Plugin<Project> {
         val signingReady = alias != null && keyPass != null && storePass != null && keystoreFile.exists()
 
         if (signingReady) {
-            project.logger.lifecycle("Release signing configured with keystore: $keystorePath")
+            project.logger.lifecycle("✅ Release signing configured with keystore: $keystorePath")
             signingConfigs {
                 create("release") {
                     keyAlias = alias
@@ -36,11 +36,13 @@ class AndroidBuildConfigPlugin : Plugin<Project> {
                 }
             }
         } else {
-            project.logger.warn("Release signing NOT configured — APK will be unsigned")
-            if (alias == null) project.logger.warn("  Missing SIGNING_KEY_ALIAS")
-            if (keyPass == null) project.logger.warn("  Missing SIGNING_KEY_PASSWORD")
-            if (storePass == null) project.logger.warn("  Missing SIGNING_STORE_PASSWORD")
-            if (!keystoreFile.exists()) project.logger.warn("  Keystore not found at $keystorePath")
+            // Only show info message, not warnings
+            project.logger.info("ℹ️  Release signing not configured - APK will be unsigned")
+            project.logger.debug("  To sign releases, set up:")
+            project.logger.debug("  - SIGNING_KEY_ALIAS environment variable")
+            project.logger.debug("  - SIGNING_KEY_PASSWORD environment variable")
+            project.logger.debug("  - SIGNING_STORE_PASSWORD environment variable")
+            project.logger.debug("  - Keystore file at $keystorePath")
         }
 
         project.extra.set("signingReady", signingReady)

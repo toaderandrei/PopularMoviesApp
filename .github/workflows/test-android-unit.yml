@@ -1,0 +1,37 @@
+name: Test - Android Unit
+
+on:
+  # Only run manually, not on PRs (PR tests are handled by build-pr.yml)
+  workflow_dispatch:
+
+env:
+  TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+
+jobs:
+  unit-tests:
+    name: Android Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Run Unit Tests
+        run: ./gradlew test
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            **/build/reports/tests/
+            **/build/test-results/

@@ -1,0 +1,332 @@
+name: iOS Complete Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 1.0.3)'
+        required: true
+        type: string
+      build_number:
+        description: 'Build number (e.g. 100)'
+        required: true
+        type: string
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
+      deploy_testflight:
+        description: 'Deploy to TestFlight'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: ios-release-${{ github.ref }}-${{ inputs.environment }}
+  cancel-in-progress: true
+
+env:
+  TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+
+jobs:
+  build-ios-complete:
+    name: Build Complete iOS Infrastructure
+    runs-on: macos-14
+    timeout-minutes: 60
+    steps:
+      # ===== SETUP PHASE =====
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # For changelog generation
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-home-cache-cleanup: true
+          cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
+
+      - name: Cache Kotlin Native
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            konan-${{ runner.os }}-
+
+      # ===== BUILD KMP FRAMEWORK =====
+      - name: Build KMP Frameworks for iOS
+        run: |
+          echo "📱 Building KMP frameworks for iOS..."
+
+          # Build all required frameworks
+          ./gradlew :shared:embedAndSignAppleFrameworkForXcode \
+            -Pconfiguration.build.type=release \
+            -PversionName=${{ inputs.version }} \
+            -PversionCode=${{ inputs.build_number }}
+
+          ./gradlew :shared-ui:embedAndSignAppleFrameworkForXcode \
+            -Pconfiguration.build.type=release \
+            -PversionName=${{ inputs.version }} \
+            -PversionCode=${{ inputs.build_number }}
+
+          echo "✅ KMP frameworks built successfully"
+
+      # ===== RUBY/COCOAPODS SETUP =====
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: iosApp
+
+      - name: Setup CocoaPods
+        run: |
+          echo "📦 Setting up CocoaPods..."
+          gem install cocoapods
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: iosApp/Pods
+          key: pods-${{ runner.os }}-${{ hashFiles('iosApp/Podfile.lock') }}
+          restore-keys: |
+            pods-${{ runner.os }}-
+
+      - name: Install CocoaPods Dependencies
+        working-directory: iosApp
+        run: |
+          echo "📥 Installing CocoaPods dependencies..."
+
+          # Remove old Pods directory to ensure clean state
+          rm -rf Pods
+
+          # Install pods
+          pod install --repo-update --verbose
+
+          echo "✅ Pods installed successfully"
+
+      # ===== FASTLANE SETUP (Optional but recommended) =====
+      - name: Setup Fastlane
+        if: ${{ inputs.deploy_testflight }}
+        working-directory: iosApp
+        run: |
+          echo "🚀 Setting up Fastlane..."
+
+          # Install Fastlane if Gemfile exists
+          if [ -f "Gemfile" ]; then
+            bundle install
+          else
+            gem install fastlane
+          fi
+
+          echo "✅ Fastlane ready"
+
+      # ===== VERSION MANAGEMENT =====
+      - name: Update Version and Build Number
+        working-directory: iosApp
+        run: |
+          echo "📝 Updating version to ${{ inputs.version }} (${{ inputs.build_number }})..."
+
+          # Update Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${{ inputs.version }}" iosApp/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${{ inputs.build_number }}" iosApp/Info.plist || true
+
+          # Update project settings if using xcconfig
+          if [ -f "Config/Version.xcconfig" ]; then
+            echo "MARKETING_VERSION = ${{ inputs.version }}" > Config/Version.xcconfig
+            echo "CURRENT_PROJECT_VERSION = ${{ inputs.build_number }}" >> Config/Version.xcconfig
+          fi
+
+      # ===== BUILD IOS APP =====
+      - name: Build iOS App (Development)
+        if: ${{ !inputs.deploy_testflight }}
+        working-directory: iosApp
+        run: |
+          echo "🔨 Building iOS app for development..."
+
+          xcodebuild clean build \
+            -workspace PopularMovies.xcworkspace \
+            -scheme PopularMovies \
+            -configuration Debug \
+            -sdk iphoneos \
+            -derivedDataPath build/DerivedData \
+            -destination generic/platform=iOS \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            | xcpretty
+
+          echo "✅ Development build completed"
+
+      # ===== BUILD FOR TESTFLIGHT (WITH SIGNING) =====
+      - name: Setup Code Signing
+        if: ${{ inputs.deploy_testflight }}
+        uses: apple-actions/import-codesign-certs@v2
+        with:
+          p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
+          p12-password: ${{ secrets.CERTIFICATES_PASSWORD }}
+
+      - name: Download Provisioning Profiles
+        if: ${{ inputs.deploy_testflight }}
+        uses: apple-actions/download-provisioning-profiles@v2
+        with:
+          bundle-id: com.ant.popular.movies
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+
+      - name: Build iOS App for TestFlight
+        if: ${{ inputs.deploy_testflight }}
+        working-directory: iosApp
+        run: |
+          echo "🔨 Building iOS app for TestFlight..."
+
+          # If Fastlane is available, use it
+          if command -v fastlane &> /dev/null || command -v bundle &> /dev/null; then
+            echo "Using Fastlane for build..."
+
+            # Create minimal Fastfile if it doesn't exist
+            if [ ! -f "fastlane/Fastfile" ]; then
+              mkdir -p fastlane
+              cat > fastlane/Fastfile << 'EOF'
+          default_platform(:ios)
+
+          platform :ios do
+            lane :build_for_testflight do
+              build_app(
+                workspace: "PopularMovies.xcworkspace",
+                scheme: "PopularMovies",
+                configuration: "Release",
+                export_method: "app-store",
+                output_directory: "build/",
+                output_name: "PopularMovies.ipa"
+              )
+            end
+          end
+          EOF
+            fi
+
+            bundle exec fastlane build_for_testflight || fastlane build_for_testflight
+          else
+            # Fallback to xcodebuild
+            echo "Using xcodebuild..."
+
+            xcodebuild archive \
+              -workspace PopularMovies.xcworkspace \
+              -scheme PopularMovies \
+              -configuration Release \
+              -archivePath build/PopularMovies.xcarchive \
+              -destination generic/platform=iOS \
+              | xcpretty
+
+            xcodebuild -exportArchive \
+              -archivePath build/PopularMovies.xcarchive \
+              -exportPath build/IPA \
+              -exportOptionsPlist ../ExportOptions.plist \
+              | xcpretty
+          fi
+
+          echo "✅ TestFlight build completed"
+
+      # ===== DEPLOY TO TESTFLIGHT =====
+      - name: Upload to TestFlight
+        if: ${{ inputs.deploy_testflight }}
+        working-directory: iosApp
+        run: |
+          echo "📤 Uploading to TestFlight..."
+
+          # If Fastlane is available, use it
+          if command -v fastlane &> /dev/null || command -v bundle &> /dev/null; then
+            # Create upload lane if needed
+            if ! grep -q "upload_to_testflight" fastlane/Fastfile 2>/dev/null; then
+              cat >> fastlane/Fastfile << 'EOF'
+
+            lane :deploy_testflight do
+              upload_to_testflight(
+                ipa: "build/PopularMovies.ipa",
+                skip_waiting_for_build_processing: true,
+                apple_id: ENV["APPLE_APP_ID"],
+                team_id: ENV["APPSTORE_TEAM_ID"],
+                changelog: "Version ${{ inputs.version }} Build ${{ inputs.build_number }}"
+              )
+            end
+          EOF
+            fi
+
+            bundle exec fastlane deploy_testflight || fastlane deploy_testflight
+          else
+            # Use GitHub Action
+            echo "Using GitHub Action for TestFlight upload..."
+          fi
+
+      - name: Upload to TestFlight (Action)
+        if: ${{ inputs.deploy_testflight && failure() }}
+        uses: Apple-Actions/upload-testflight-build@v1
+        with:
+          app-path: iosApp/build/PopularMovies.ipa
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+
+      # ===== ARTIFACTS =====
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-${{ inputs.environment }}-${{ inputs.version }}
+          path: |
+            iosApp/build/**/*.app
+            iosApp/build/**/*.ipa
+            iosApp/build/**/*.dSYM
+            iosApp/build/**/*.xcarchive
+
+      # ===== GITHUB RELEASE =====
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "## iOS Release v${{ inputs.version }}" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### Configuration" >> $GITHUB_OUTPUT
+          echo "- Environment: ${{ inputs.environment }}" >> $GITHUB_OUTPUT
+          echo "- Build Number: ${{ inputs.build_number }}" >> $GITHUB_OUTPUT
+          echo "- TestFlight: ${{ inputs.deploy_testflight && 'Deployed' || 'Not deployed' }}" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### Changes" >> $GITHUB_OUTPUT
+          git log --pretty=format:"- %s" HEAD~10..HEAD >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        if: ${{ inputs.environment == 'production' }}
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: "ios-v${{ inputs.version }}"
+          name: "iOS Release v${{ inputs.version }}"
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: ${{ inputs.environment != 'production' }}
+
+      # ===== NOTIFICATIONS =====
+      - name: Notify Success
+        if: success()
+        run: |
+          echo "✅ iOS Release v${{ inputs.version }} completed successfully!"
+          echo "Environment: ${{ inputs.environment }}"
+          echo "TestFlight: ${{ inputs.deploy_testflight && 'Deployed' || 'Skipped' }}"
+
+      - name: Notify Failure
+        if: failure()
+        run: |
+          echo "❌ iOS Release v${{ inputs.version }} failed!"
+          echo "Check the workflow logs for details."

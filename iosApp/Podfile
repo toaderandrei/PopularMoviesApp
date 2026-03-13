@@ -1,0 +1,51 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '14.0'
+
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+
+# Ensure we use the locally built framework
+use_frameworks!
+inhibit_all_warnings!
+
+target 'PopularMovies' do
+  # KMP Framework from Gradle build
+  pod 'shared', :path => '../shared'
+  pod 'shared_ui', :path => '../shared-ui'
+
+  # iOS-specific dependencies (if needed)
+  # pod 'Firebase/Analytics'
+  # pod 'Firebase/Crashlytics'
+
+  # UI/UX dependencies
+  # pod 'lottie-ios'  # For animations if needed
+  # pod 'SDWebImage'  # Alternative to Coil for iOS if needed
+
+  # Networking (if iOS-specific networking is needed)
+  # pod 'Alamofire'
+
+  # Note: Test targets removed since testing is handled by KMP shared code
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      # Fix for Xcode 15
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+
+      # Disable bitcode
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+
+      # Set Swift version
+      config.build_settings['SWIFT_VERSION'] = '5.9'
+
+      # Exclude arm64 from simulator builds for M1 compatibility
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+    end
+  end
+
+  # Fix for bundle signing
+  installer.pods_project.build_configurations.each do |config|
+    config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+  end
+end

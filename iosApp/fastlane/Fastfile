@@ -1,0 +1,208 @@
+# Fastlane configuration for Popular Movies iOS app
+# This file contains the iOS build and deployment automation
+
+default_platform(:ios)
+
+platform :ios do
+  # ===== BUILD LANES =====
+
+  desc "Build and test the app"
+  lane :test do
+    setup_ci if ENV['CI']
+
+    # Build shared KMP framework first
+    gradle(
+      task: ":shared:embedAndSignAppleFrameworkForXcode",
+      project_dir: "../"
+    )
+
+    # Run iOS tests
+    run_tests(
+      workspace: "PopularMovies.xcworkspace",
+      scheme: "PopularMovies",
+      clean: true,
+      devices: ["iPhone 15"]
+    )
+  end
+
+  desc "Build the app for local development"
+  lane :build_dev do
+    build_app(
+      workspace: "PopularMovies.xcworkspace",
+      scheme: "PopularMovies",
+      configuration: "Debug",
+      skip_package_ipa: true,
+      skip_archive: true,
+      skip_codesigning: true,
+      clean: true
+    )
+  end
+
+  # ===== DISTRIBUTION LANES =====
+
+  desc "Deploy to TestFlight (Development)"
+  lane :deploy_dev do
+    deploy_to_testflight(
+      environment: "DEV",
+      configuration: "Debug",
+      groups: ["internal-testers"]
+    )
+  end
+
+  desc "Deploy to TestFlight (Staging)"
+  lane :deploy_staging do
+    deploy_to_testflight(
+      environment: "STAGING",
+      configuration: "Release",
+      groups: ["beta-testers"]
+    )
+  end
+
+  desc "Deploy to TestFlight (Production)"
+  lane :deploy_production do
+    deploy_to_testflight(
+      environment: "PRODUCTION",
+      configuration: "Release",
+      groups: ["external-testers"]
+    )
+  end
+
+  desc "Submit to App Store"
+  lane :release do
+    # Ensure we're on the main branch
+    ensure_git_status_clean
+    ensure_git_branch(branch: "main")
+
+    # Get version info
+    version = get_version_number(
+      xcodeproj: "PopularMovies.xcodeproj",
+      target: "PopularMovies"
+    )
+    build_number = get_build_number(
+      xcodeproj: "PopularMovies.xcodeproj"
+    )
+
+    # Build and upload
+    build_app(
+      workspace: "PopularMovies.xcworkspace",
+      scheme: "PopularMovies",
+      configuration: "Release",
+      export_method: "app-store",
+      clean: true
+    )
+
+    upload_to_app_store(
+      app_version: version,
+      build_number: build_number,
+      submit_for_review: false,
+      automatic_release: false,
+      skip_screenshots: true,
+      skip_metadata: false,
+      precheck_include_in_app_purchases: false
+    )
+
+    # Notify
+    puts "🎉 Successfully submitted v#{version} (#{build_number}) to App Store!"
+  end
+
+  # ===== PRIVATE LANES =====
+
+  private_lane :deploy_to_testflight do |options|
+    setup_ci if ENV['CI']
+
+    environment = options[:environment]
+    configuration = options[:configuration]
+    groups = options[:groups]
+
+    # Build KMP framework
+    gradle(
+      task: ":shared:embedAndSignAppleFrameworkForXcode",
+      project_dir: "../",
+      properties: {
+        "configuration.build.type" => configuration.downcase
+      }
+    )
+
+    # Update pods
+    cocoapods(
+      repo_update: true,
+      clean_install: true
+    )
+
+    # Get version info
+    version = get_version_number(
+      xcodeproj: "PopularMovies.xcodeproj",
+      target: "PopularMovies"
+    )
+    build_number = get_build_number(
+      xcodeproj: "PopularMovies.xcodeproj"
+    )
+
+    # Increment build number if needed
+    latest_build = latest_testflight_build_number(
+      version: version,
+      initial_build_number: 0
+    )
+
+    if build_number.to_i <= latest_build
+      build_number = increment_build_number(
+        build_number: latest_build + 1,
+        xcodeproj: "PopularMovies.xcodeproj"
+      )
+      puts "📝 Incremented build number to #{build_number}"
+    end
+
+    # Build the app
+    build_app(
+      workspace: "PopularMovies.xcworkspace",
+      scheme: "PopularMovies",
+      configuration: configuration,
+      export_method: "app-store",
+      clean: true,
+      output_directory: "./build",
+      output_name: "PopularMovies.ipa"
+    )
+
+    # Generate changelog
+    changelog = generate_changelog
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      ipa: "./build/PopularMovies.ipa",
+      skip_waiting_for_build_processing: true,
+      distribute_external: true,
+      groups: groups,
+      changelog: changelog,
+      notify_external_testers: true
+    )
+
+    # Clean up
+    clean_build_artifacts
+
+    puts "✅ #{environment}: iOS App v#{version} (#{build_number}) deployed to TestFlight"
+  end
+
+  private_lane :generate_changelog do
+    # Get recent commits
+    commits = changelog_from_git_commits(
+      between: [last_git_tag, "HEAD"],
+      pretty: "- %s",
+      merge_commit_filtering: "exclude_merges"
+    )
+
+    # Format changelog
+    changelog = "What's New:\n\n"
+    changelog += commits || "Bug fixes and improvements"
+
+    return changelog
+  end
+
+  # ===== ERROR HANDLING =====
+
+  error do |lane, exception|
+    puts "❌ Error in lane #{lane}: #{exception.message}"
+
+    # Clean up on error
+    clean_build_artifacts
+  end
+end

@@ -1,0 +1,48 @@
+# Simple Fastlane setup for Popular Movies
+# Use this when you're ready for TestFlight/App Store
+
+default_platform(:ios)
+
+platform :ios do
+
+  # Build and upload to TestFlight
+  desc "Deploy to TestFlight"
+  lane :beta do
+    # Build KMP framework
+    gradle(
+      task: ":shared:embedAndSignAppleFrameworkForXcode",
+      project_dir: "../"
+    )
+
+    # Install pods
+    cocoapods
+
+    # Build app
+    build_app(
+      workspace: "PopularMovies.xcworkspace",
+      scheme: "PopularMovies"
+    )
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+  end
+
+  # Release to App Store
+  desc "Release to App Store"
+  lane :release do
+    # Build
+    build_app(
+      workspace: "PopularMovies.xcworkspace",
+      scheme: "PopularMovies"
+    )
+
+    # Upload to App Store
+    upload_to_app_store(
+      skip_screenshots: true,
+      skip_metadata: false
+    )
+  end
+
+end

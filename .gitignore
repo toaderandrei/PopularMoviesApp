@@ -55,3 +55,8 @@ build-logic/convention/build
 .andrei/
 /.kotlin/sessions/kotlin-compiler-5768803993475401477.salive
 /iosApp/PopularMovies.xcodeproj/
+
+# CocoaPods
+iosApp/Pods/
+iosApp/Podfile.lock
+iosApp/PopularMovies.xcworkspace/
