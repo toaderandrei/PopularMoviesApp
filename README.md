@@ -33,42 +33,150 @@ This Kotlin Multiplatform (KMP) application showcases popular movies and TV seri
 
 ## Architecture and Project Structure
 
-The project follows **Clean Architecture** with clear separation of concerns, organized into feature modules and core modules.
+The project follows **Clean Architecture** with clear separation of concerns, organized into feature modules and core modules, built with **Kotlin Multiplatform (KMP)** for both Android and iOS.
 
 For detailed architecture documentation, see [`documentation/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-https://developer.android.com/topic/architecture
+### Architecture Diagram
 
-![android_architecture_diagram.png](pictures/clean_architecture_diagram.png)
+The application uses a layered architecture with KMP at its core:
+
+![KMP Architecture Diagram](pictures/kmp_architecture.puml)
+
+**To view the diagram:** Use [PlantUML Preview](https://plantuml.com/starting) or install a PlantUML plugin in your IDE.
+
+Alternatively, you can view the [Module Dependencies Diagram](pictures/module_dependencies.puml) which shows the relationship between all modules.
+
+### Architecture Layers
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Platform Layer                            │
+│  ┌──────────────────┐              ┌──────────────────┐    │
+│  │  Android App     │              │    iOS App       │    │
+│  │ (MainActivity)   │              │ (ContentView)    │    │
+│  └────────┬─────────┘              └────────┬─────────┘    │
+│           └──────────────┬──────────────────┘              │
+└───────────────────────────┼─────────────────────────────────┘
+                            │
+┌───────────────────────────┼─────────────────────────────────┐
+│                  Shared UI Layer (KMP)                       │
+│                     ┌─────▼──────┐                           │
+│                     │ shared-ui  │                           │
+│                     │ Koin DI    │                           │
+│                     │ Navigation │                           │
+│                     └─────┬──────┘                           │
+└───────────────────────────┼─────────────────────────────────┘
+                            │
+┌───────────────────────────┼─────────────────────────────────┐
+│              Feature Modules (commonMain)                    │
+│  ┌────────┐  ┌─────────┐  ┌────────┐  ┌────────┐           │
+│  │ Movies │  │Favorites│  │ Search │  │ Login  │  ...      │
+│  │Route   │  │ Route   │  │ Route  │  │ Route  │           │
+│  │Screen  │  │ Screen  │  │ Screen │  │ Screen │           │
+│  │ViewModel│ │ViewModel│ │ViewModel│ │ViewModel│          │
+│  │UiState │  │ UiState │  │ UiState│  │ UiState│           │
+│  └────┬───┘  └────┬────┘  └────┬───┘  └────┬───┘           │
+└───────┼───────────┼────────────┼───────────┼───────────────┘
+        └───────────┴────────────┴───────────┘
+                            │
+┌───────────────────────────┼─────────────────────────────────┐
+│               Domain Layer (commonMain)                      │
+│                     ┌─────▼──────┐                           │
+│                     │ Use Cases  │                           │
+│                     │ (Business  │                           │
+│                     │   Logic)   │                           │
+│                     └─────┬──────┘                           │
+│                     ┌─────▼──────┐                           │
+│                     │Repository  │                           │
+│                     │Interfaces  │                           │
+│                     └─────┬──────┘                           │
+└───────────────────────────┼─────────────────────────────────┘
+                            │
+┌───────────────────────────┼─────────────────────────────────┐
+│                Data Layer (commonMain)                       │
+│                     ┌─────▼──────┐                           │
+│                     │Repository  │                           │
+│                     │ Impls      │                           │
+│                     └──┬───┬───┬─┘                           │
+│          ┌─────────────┼───┼───┼─────────────┐              │
+│          │             │   │   │             │              │
+│     ┌────▼────┐  ┌────▼───▼───▼────┐  ┌─────▼─────┐       │
+│     │ Network │  │    Database      │  │ DataStore │       │
+│     │  (Ktor) │  │  (Room KMP)      │  │   (KMP)   │       │
+│     │         │  │                  │  │           │       │
+│     │ TMDb API│  │ MoviesDao        │  │ Session   │       │
+│     │DataSource│ │ TvSeriesDao      │  │ Manager   │       │
+│     └────┬────┘  └──────┬───────────┘  └───────────┘       │
+└──────────┼──────────────┼─────────────────────────────────┘
+           │              │
+      ┌────▼────┐    ┌────▼────┐
+      │  TMDb   │    │ SQLite  │
+      │   API   │    │   DB    │
+      └─────────┘    └─────────┘
+```
+
+**Key Principles:**
+- ✅ **Dependency Rule**: Dependencies point inward (UI → Domain → Data)
+- ✅ **Platform-Agnostic Core**: All business logic in `commonMain`
+- ✅ **Platform-Specific Implementations**: HTTP client, database, analytics in `androidMain`/`iosMain`
+- ✅ **Single Source of Truth**: Room database + DataStore for local data
+- ✅ **Reactive Data Flow**: Kotlin Flow for async operations
+- ✅ **Unidirectional Data Flow**: UI events → ViewModel → Use Cases → Repositories
+
+https://developer.android.com/topic/architecture
 
 ### Module Structure
 
 ```
-app/                           # Main entry point, Compose navigation, themes
-build-logic/convention/        # Gradle convention plugins
+app/                           # Android application entry point
+  └── src/main/                # Compose navigation, themes, MainActivity
 
-features/
+iosApp/                        # iOS application (Xcode project)
+  └── PopularMovies/           # SwiftUI views, ContentView
+
+build-logic/convention/        # Gradle convention plugins for KMP
+
+features/ (KMP)                # Feature modules - all in commonMain
   movies/                      # Movie browsing, categories, and details
+    └── src/commonMain/        # Shared Compose UI, ViewModel, UiState
   tvshow/                      # TV series browsing, categories, and details
-  favorites/                   # Saved favorites management
-  search/                      # Search functionality
+  favorites/                   # Saved favorites management with sync
+  search/                      # Search functionality with debouncing
   login/                       # Authentication (login, welcome, account)
+  welcome/                     # Welcome screen with backdrop animation
 
-core/
-  domain/                      # Use cases (business logic)
-  data/                        # Repository implementations
+core/ (KMP)                    # Core infrastructure - all in commonMain
+  domain/                      # Use cases (business logic), Repository interfaces
+  data/                        # Repository implementations, data mappers
   models/                      # Pure Kotlin domain models and DTOs
-  database/                    # Room KMP database, entity classes, mappers
-  network/                     # Ktor-based network layer, data sources
-  datastore/                   # DataStore KMP preferences (session, guest mode)
-  shared/                      # Shared utilities, Koin DI, dispatcher qualifiers
-  ui/                          # Shared UI components, navigation destinations
-  resources/                   # Shared resources (strings, drawables, fonts)
-  analytics/                   # Firebase Analytics/Crashlytics
+  database/                    # Room KMP database, DAOs, entity mappers
+  network/                     # Ktor client, TMDb API, data sources
+  datastore/                   # DataStore KMP (session, preferences)
+  shared/                      # Dispatchers, Logger (Kermit), Koin modules
+  ui/                          # Shared Composables, Navigation destinations
+  resources/                   # Compose Resources (strings, drawables)
+  analytics/                   # Firebase Analytics/Crashlytics abstraction
 
-shared/                         # KMP framework for iOS export
-shared-ui/                      # Aggregates all features and UI for iOS
+shared/ (KMP)                  # iOS framework export
+  └── src/
+      ├── commonMain/          # Exports core modules
+      ├── androidMain/         # Android platform implementations
+      └── iosMain/             # iOS platform implementations
+
+shared-ui/ (KMP)               # UI aggregation for iOS
+  └── src/commonMain/          # Koin DI setup, aggregates all features
 ```
+
+**Module Types:**
+- **KMP Modules** (all `core/`, `features/`, `shared/`, `shared-ui/`):
+  - `src/commonMain/kotlin/` - Shared Kotlin code for Android + iOS
+  - `src/androidMain/kotlin/` - Android-specific implementations
+  - `src/iosMain/kotlin/` - iOS-specific implementations
+
+- **Platform Modules**:
+  - `app/` - Android app (uses `shared-ui`)
+  - `iosApp/` - iOS app (uses `shared.framework`)
 
 ### Key Patterns
 
