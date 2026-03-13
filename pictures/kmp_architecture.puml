@@ -1,0 +1,260 @@
+@startuml KMP Architecture
+!theme plain
+skinparam componentStyle rectangle
+skinparam linetype ortho
+
+' Define color scheme
+skinparam component {
+  BackgroundColor<<ui>> #FFE6E6
+  BackgroundColor<<domain>> #E6FFE6
+  BackgroundColor<<data>> #FFE6CC
+  BackgroundColor<<network>> #E6E6FF
+  BackgroundColor<<database>> #FFE6FF
+  BackgroundColor<<platform>> #E6F3FF
+  BackgroundColor<<shared>> #FFF9E6
+  BorderColor #333333
+}
+
+' Platform-specific Apps
+package "Android App" <<platform>> {
+  [MainActivityCompose] <<ui>>
+}
+
+package "iOS App" <<platform>> {
+  [ContentView.swift] <<ui>>
+}
+
+' Shared UI Layer
+package "shared-ui (KMP)" <<shared>> {
+  package "UI Layer (Compose Multiplatform)" <<ui>> {
+    [Koin DI Setup]
+    [Navigation Setup]
+  }
+}
+
+' Feature Modules (KMP)
+package "Feature Modules (commonMain)" {
+  package "features:movies" <<ui>> {
+    [MoviesRoute] <<ui>>
+    [MoviesScreen] <<ui>>
+    [MoviesViewModel] <<ui>>
+    [MoviesUiState] <<ui>>
+  }
+
+  package "features:favorites" <<ui>> {
+    [FavoritesRoute] <<ui>>
+    [FavoritesScreen] <<ui>>
+    [FavoritesViewModel] <<ui>>
+    [FavoritesUiState] <<ui>>
+  }
+
+  package "features:login" <<ui>> {
+    [LoginRoute] <<ui>>
+    [LoginViewModel] <<ui>>
+  }
+
+  note right of [features:login]
+    Other features:
+    - search
+    - tvshow
+    - welcome
+  end note
+}
+
+' Core Modules (KMP)
+package "Core Layer (commonMain)" {
+
+  package "core:domain" <<domain>> {
+    [Use Cases] <<domain>>
+    [Repository Interfaces] <<domain>>
+    note right of [Use Cases]
+      - MovieListUseCase
+      - SyncFavoritesFromRemoteUseCase
+      - SaveMovieDetailsUseCase
+      Returns Flow<Result<T>>
+    end note
+  }
+
+  package "core:data" <<data>> {
+    [Repository Implementations] <<data>>
+    [Data Mappers] <<data>>
+    note right of [Repository Implementations]
+      - DefaultMovieRepository
+      - DefaultFavoriteRepository
+      - SyncFavoritesFromRemoteRepository
+    end note
+  }
+
+  package "core:network" <<network>> {
+    [Ktor Client] <<network>>
+    [TMDb API] <<network>>
+    [Data Sources] <<network>>
+    [DTO Models] <<network>>
+    note right of [TMDb API]
+      - TmdbApi (public)
+      - TmdbAuthApi (authenticated)
+      - KtorTmdbApi implementation
+    end note
+  }
+
+  package "core:database" <<database>> {
+    [Room Database] <<database>>
+    [DAOs] <<database>>
+    [Entity Models] <<database>>
+    note right of [Room Database]
+      - MoviesDb (Room KMP)
+      - MoviesDao, TvSeriesDao
+      - Entity-Domain mappers
+    end note
+  }
+
+  package "core:datastore" <<database>> {
+    [DataStore] <<database>>
+    [SessionManager] <<database>>
+  }
+
+  package "core:models" {
+    [Domain Models] <<domain>>
+    [Request/Result Types] <<domain>>
+  }
+
+  package "core:shared" {
+    [Dispatchers]
+    [Logger]
+    [Koin Modules]
+  }
+
+  package "core:ui" <<ui>> {
+    [Shared Composables] <<ui>>
+    [Navigation Destinations] <<ui>>
+    [Theme] <<ui>>
+  }
+
+  package "core:resources" {
+    [Strings (XML)]
+    [Drawables]
+  }
+
+  package "core:analytics" {
+    [Firebase Analytics]
+    [Crashlytics]
+  }
+}
+
+' External Services
+cloud "TMDb API" as TMDB {
+  [REST Endpoints]
+  [Authentication]
+}
+
+database "Local Storage" {
+  [Room SQLite]
+  [DataStore Preferences]
+}
+
+' Platform-specific implementations
+package "Platform Implementations" <<platform>> {
+  component "androidMain" <<platform>> {
+    [HttpClient (OkHttp)]
+    [Database Factory]
+    [DataStore Factory]
+    [Firebase]
+  }
+
+  component "iosMain" <<platform>> {
+    [HttpClient (Darwin)]
+    [Database Factory]
+    [DataStore Factory]
+    [Analytics]
+  }
+}
+
+' Relationships - UI Layer
+[MainActivityCompose] --> [Koin DI Setup] : uses
+[ContentView.swift] --> [Koin DI Setup] : uses
+[Koin DI Setup] --> [Navigation Setup] : initializes
+[Navigation Setup] --> [MoviesRoute] : navigates to
+[Navigation Setup] --> [FavoritesRoute] : navigates to
+[Navigation Setup] --> [LoginRoute] : navigates to
+
+' Relationships - Feature to ViewModel
+[MoviesRoute] --> [MoviesViewModel] : injects
+[MoviesRoute] --> [MoviesScreen] : calls
+[MoviesViewModel] --> [MoviesUiState] : manages
+
+[FavoritesRoute] --> [FavoritesViewModel] : injects
+[FavoritesRoute] --> [FavoritesScreen] : calls
+[FavoritesViewModel] --> [FavoritesUiState] : manages
+
+[LoginRoute] --> [LoginViewModel] : injects
+
+' Relationships - ViewModel to Domain
+[MoviesViewModel] --> [Use Cases] : calls
+[FavoritesViewModel] --> [Use Cases] : calls
+[LoginViewModel] --> [Use Cases] : calls
+
+' Relationships - Domain Layer
+[Use Cases] --> [Repository Interfaces] : depends on
+[Repository Interfaces] <|.. [Repository Implementations] : implements
+
+' Relationships - Data Layer
+[Repository Implementations] --> [Data Mappers] : uses
+[Repository Implementations] --> [Data Sources] : uses
+[Repository Implementations] --> [DAOs] : uses
+[Repository Implementations] --> [SessionManager] : uses
+
+' Relationships - Network Layer
+[Data Sources] --> [Ktor Client] : uses
+[Data Sources] --> [TMDb API] : uses
+[Ktor Client] --> TMDB : HTTP requests
+[TMDb API] --> [DTO Models] : returns
+
+' Relationships - Database Layer
+[DAOs] --> [Room Database] : part of
+[Room Database] --> [Room SQLite] : persists to
+[DAOs] --> [Entity Models] : returns
+[Entity Models] <--> [Domain Models] : maps via\nEntityMappers
+
+' Relationships - DataStore
+[SessionManager] --> [DataStore] : uses
+[DataStore] --> [DataStore Preferences] : persists to
+
+' Relationships - Platform
+[Ktor Client] ..> [HttpClient (OkHttp)] : Android
+[Ktor Client] ..> [HttpClient (Darwin)] : iOS
+[Room Database] ..> [Database Factory] : Android
+[Room Database] ..> [Database Factory] : iOS
+[DataStore] ..> [DataStore Factory] : Android
+[DataStore] ..> [DataStore Factory] : iOS
+
+' Shared resources
+[MoviesScreen] --> [Shared Composables] : uses
+[FavoritesScreen] --> [Shared Composables] : uses
+[MoviesScreen] --> [Theme] : applies
+
+' Dependency injection
+[Koin DI Setup] --> [Koin Modules] : loads
+[Koin Modules] --> [Use Cases] : provides
+[Koin Modules] --> [Repository Implementations] : provides
+[Koin Modules] --> [Dispatchers] : provides
+
+' Analytics
+[MoviesViewModel] --> [Firebase Analytics] : logs events
+[Firebase Analytics] ..> [Firebase] : Android
+[Firebase Analytics] ..> [Analytics] : iOS
+
+' Logging
+[Repository Implementations] --> [Logger] : logs
+[Use Cases] --> [Logger] : logs
+
+legend right
+  |= Layer |= Technology |= Platform |
+  | UI | Compose Multiplatform | commonMain |
+  | Domain | Pure Kotlin | commonMain |
+  | Data | Repositories + Mappers | commonMain |
+  | Network | Ktor Client | commonMain |
+  | Database | Room KMP | commonMain |
+  | Platform | OkHttp/Darwin, Firebase | androidMain/iosMain |
+endlegend
+
+@enduml

@@ -1,4 +1,4 @@
-package com.ant.common.logger
+package com.ant.shared.logger
 
 import timber.log.Timber
 

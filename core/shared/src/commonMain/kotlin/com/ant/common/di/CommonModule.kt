@@ -1,8 +1,8 @@
-package com.ant.common.di
+package com.ant.shared.di
 
-import com.ant.common.logger.KermitLogger
-import com.ant.common.logger.Logger
-import com.ant.common.qualifiers.DispatcherQualifiers
+import com.ant.shared.logger.KermitLogger
+import com.ant.shared.logger.Logger
+import com.ant.shared.qualifiers.DispatcherQualifiers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

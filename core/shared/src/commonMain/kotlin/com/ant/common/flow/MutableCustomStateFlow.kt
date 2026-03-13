@@ -1,4 +1,4 @@
-package com.ant.common.flow
+package com.ant.shared.flow
 
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow

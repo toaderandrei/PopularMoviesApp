@@ -9,4 +9,4 @@ Shared UI components and navigation infrastructure for the Android app layer.
 - Shared composable components used across feature modules
 
 ## Dependencies
-- `core:models`, `core:common`, `core:resources`
+- `core:models`, `core:shared`, `core:resources`

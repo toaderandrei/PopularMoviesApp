@@ -1,4 +1,4 @@
-package com.ant.common.exceptions
+package com.ant.shared.exceptions
 
 import kotlinx.coroutines.delay
 import kotlin.coroutines.cancellation.CancellationException

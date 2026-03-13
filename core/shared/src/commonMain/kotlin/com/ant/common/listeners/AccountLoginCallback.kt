@@ -1,4 +1,4 @@
-package com.ant.common.listeners
+package com.ant.shared.listeners
 
 /** Callback for account-level login and logout actions. */
 interface AccountLoginCallback {

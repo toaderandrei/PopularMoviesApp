@@ -87,7 +87,7 @@ The project follows Clean Architecture with clear separation of concerns:
   - `core:network` - Ktor-based network layer, data sources, mappers
   - `core:datastore` - DataStore KMP for preferences/settings
   - `core:models` - Pure Kotlin domain models and DTOs (no Room annotations)
-  - `core:shared` - Shared utilities, Koin DI, dispatcher qualifiers (previously `core:common`)
+  - `core:shared` - Shared utilities, Koin DI, dispatcher qualifiers (previously `core:shared`)
   - `core:ui` - Shared UI components, navigation destinations
   - `core:resources` - Shared resources (strings, drawables, etc.)
   - `core:analytics` - Analytics/Firebase integration

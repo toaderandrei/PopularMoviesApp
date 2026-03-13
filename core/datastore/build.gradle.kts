@@ -1,17 +1,5 @@
-
 plugins {
     id("popular.movies.kmp.library")
-}
-
-kotlin {
-    sourceSets {
-        val androidHostTest by getting {
-            dependencies {
-                implementation(libs.mockK)
-                implementation(libs.turbine)
-            }
-        }
-    }
 }
 
 dependencies {
@@ -22,8 +10,13 @@ dependencies {
     // DataStore (exposed as API for consumers to create DataStore instances)
     commonMainApi(libs.data.store.preferences)
 
-    androidMainApi(libs.koin.android)
+    // Koin
     commonMainApi(libs.koin.core)
+    androidMainApi(libs.koin.android)
     // Koin for Android (needed for androidContext() in DatastoreModule.android.kt)
     androidMainImplementation(libs.koin.android)
+
+    // Testing
+    androidHostTestImplementation(libs.mockK)
+    androidHostTestImplementation(libs.turbine)
 }

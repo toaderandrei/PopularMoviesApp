@@ -1,4 +1,4 @@
-package com.ant.common.di
+package com.ant.shared.di
 
 /** Contract for components that require one-time initialization at app startup. */
 interface Initializer {

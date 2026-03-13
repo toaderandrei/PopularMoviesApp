@@ -1,4 +1,4 @@
-package com.ant.common.listeners
+package com.ant.shared.listeners
 
 /** Callback for saving or removing an item from favorites. */
 interface FavoriteCallback<T> {

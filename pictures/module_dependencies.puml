@@ -1,0 +1,207 @@
+@startuml Module Dependencies
+!theme plain
+skinparam packageStyle rectangle
+
+skinparam package {
+  BackgroundColor<<app>> #FFE6E6
+  BackgroundColor<<feature>> #FFE6CC
+  BackgroundColor<<core>> #E6FFE6
+  BackgroundColor<<shared>> #E6F3FF
+  BorderColor #333333
+}
+
+' Android App
+package "app" <<app>> {
+}
+
+' Shared Framework for iOS
+package "shared" <<shared>> {
+  note right
+    iOS Framework export
+    Exports all core + domain
+  end note
+}
+
+package "shared-ui" <<shared>> {
+  note right
+    Aggregates all features + UI
+    Koin DI initialization
+  end note
+}
+
+' Feature Modules
+package "features:movies" <<feature>>
+package "features:tvshow" <<feature>>
+package "features:favorites" <<feature>>
+package "features:search" <<feature>>
+package "features:login" <<feature>>
+package "features:welcome" <<feature>>
+
+' Core Modules
+package "core:domain" <<core>> {
+  note right
+    Use Cases
+    Repository Interfaces
+    Business Logic
+  end note
+}
+
+package "core:data" <<core>> {
+  note right
+    Repository Implementations
+    Data Mappers
+  end note
+}
+
+package "core:network" <<core>> {
+  note right
+    Ktor Client
+    TMDb API
+    Data Sources
+    DTO Models
+  end note
+}
+
+package "core:database" <<core>> {
+  note right
+    Room KMP
+    DAOs
+    Entity Models
+  end note
+}
+
+package "core:datastore" <<core>> {
+  note right
+    DataStore KMP
+    SessionManager
+  end note
+}
+
+package "core:models" <<core>> {
+  note right
+    Domain Models
+    Pure Kotlin
+  end note
+}
+
+package "core:shared" <<core>> {
+  note right
+    Dispatchers (IO, Default, Main)
+    Logger (Kermit)
+    Koin Modules
+  end note
+}
+
+package "core:ui" <<core>> {
+  note right
+    Shared Composables
+    Navigation Destinations
+    Theme
+  end note
+}
+
+package "core:resources" <<core>> {
+  note right
+    Strings (XML)
+    Drawables
+    Compose Resources
+  end note
+}
+
+package "core:analytics" <<core>> {
+  note right
+    Firebase Analytics
+    Crashlytics
+  end note
+}
+
+' App dependencies
+app --> shared-ui
+
+' shared-ui dependencies
+shared-ui --> "features:movies"
+shared-ui --> "features:tvshow"
+shared-ui --> "features:favorites"
+shared-ui --> "features:search"
+shared-ui --> "features:login"
+shared-ui --> "features:welcome"
+shared-ui --> "core:shared"
+
+' shared framework dependencies
+shared --> "core:models"
+shared --> "core:shared"
+shared --> "core:domain"
+shared --> "core:data"
+shared --> "core:network"
+shared --> "core:database"
+shared --> "core:datastore"
+shared --> "core:analytics"
+
+' Feature dependencies (all features have similar deps)
+"features:movies" --> "core:domain"
+"features:movies" --> "core:models"
+"features:movies" --> "core:ui"
+"features:movies" --> "core:resources"
+"features:movies" --> "core:shared"
+
+"features:favorites" --> "core:domain"
+"features:favorites" --> "core:models"
+"features:favorites" --> "core:ui"
+"features:favorites" --> "core:resources"
+"features:favorites" --> "core:shared"
+
+"features:login" --> "core:domain"
+"features:login" --> "core:models"
+"features:login" --> "core:ui"
+"features:login" --> "core:resources"
+"features:login" --> "core:shared"
+
+' Domain layer dependencies
+"core:domain" --> "core:models"
+"core:domain" --> "core:shared"
+
+' Data layer dependencies
+"core:data" --> "core:domain"
+"core:data" --> "core:models"
+"core:data" --> "core:network"
+"core:data" --> "core:database"
+"core:data" --> "core:datastore"
+"core:data" --> "core:shared"
+
+' Network layer dependencies
+"core:network" --> "core:models"
+"core:network" --> "core:shared"
+
+' Database layer dependencies
+"core:database" --> "core:models"
+
+' DataStore dependencies
+"core:datastore" --> "core:models"
+"core:datastore" --> "core:shared"
+
+' UI layer dependencies
+"core:ui" --> "core:resources"
+"core:ui" --> "core:models"
+
+' Analytics dependencies
+"core:analytics" --> "core:shared"
+
+legend right
+  |= Layer |= Responsibility |
+  | app | Android application entry point |
+  | shared | iOS framework export |
+  | shared-ui | Aggregates features + Koin DI |
+  | features:* | Feature modules (UI + ViewModels) |
+  | core:domain | Use cases + Repository interfaces |
+  | core:data | Repository implementations |
+  | core:network | Ktor + TMDb API |
+  | core:database | Room KMP database |
+  | core:datastore | DataStore preferences |
+  | core:models | Domain models |
+  | core:shared | Dispatchers, Logger, DI |
+  | core:ui | Shared UI components |
+  | core:resources | Strings, Drawables |
+  | core:analytics | Firebase Analytics |
+endlegend
+
+@enduml

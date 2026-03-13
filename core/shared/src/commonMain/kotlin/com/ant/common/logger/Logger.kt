@@ -1,4 +1,4 @@
-package com.ant.common.logger
+package com.ant.shared.logger
 
 /** Platform-agnostic logging abstraction used throughout the application. */
 interface Logger {

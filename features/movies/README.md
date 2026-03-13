@@ -13,4 +13,4 @@ Movie browsing feature module. Displays popular, top-rated, upcoming, and now-pl
 - `movies/category/{categoryType}` - Category list
 
 ## Dependencies
-- `core:domain`, `core:models`, `core:ui`, `core:resources`, `core:common`, `core:analytics`
+- `core:domain`, `core:models`, `core:ui`, `core:resources`, `core:shared`, `core:analytics`

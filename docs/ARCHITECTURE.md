@@ -121,7 +121,7 @@ shared/                            # KMP shared framework (iOS export)
 features/* --> core:domain, core:models, core:ui, core:resources
 core:domain --> core:data, core:models
 core:data --> core:models, core:network, core:database
-core:datastore --> core:common, core:models
+core:datastore --> core:shared, core:models
 app --> features/*, core/*
 ```
 

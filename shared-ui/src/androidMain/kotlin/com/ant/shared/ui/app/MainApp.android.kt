@@ -3,7 +3,7 @@ package com.ant.shared.ui.app
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ant.common.logger.Logger
+import com.ant.shared.logger.Logger
 import com.ant.models.session.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

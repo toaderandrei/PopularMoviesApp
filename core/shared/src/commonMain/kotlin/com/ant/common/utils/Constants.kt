@@ -1,4 +1,4 @@
-package com.ant.common.utils
+package com.ant.shared.utils
 
 /** Application-wide constant values for navigation arguments and UI thresholds. */
 object Constants {

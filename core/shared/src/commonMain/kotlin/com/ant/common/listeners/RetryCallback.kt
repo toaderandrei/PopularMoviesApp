@@ -1,4 +1,4 @@
-package com.ant.common.listeners
+package com.ant.shared.listeners
 
 /** Callback for retrying a failed operation. */
 interface RetryCallback {

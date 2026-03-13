@@ -118,7 +118,7 @@ For production KMP apps, use a multi-module strategy. Each module is a KMP modul
 :core:data               → Repository impls, Data Sources, Ktor client setup, SQLDelight/Room
 :core:domain             → Use Cases, Repository Interfaces (Pure Kotlin, commonMain only)
 :core:ui                 → Shared Compose Multiplatform components, Theme, Design System
-:core:common             → Utility extensions, expect/actual helpers (logging, dispatchers, UUID)
+:core:shared             → Utility extensions, expect/actual helpers (logging, dispatchers, UUID)
 
 :feature:[name]          → Standalone feature modules with their own UI + ViewModels
                            Depends on :core:domain and :core:ui

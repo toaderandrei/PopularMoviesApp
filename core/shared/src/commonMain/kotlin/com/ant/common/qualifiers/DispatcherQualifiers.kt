@@ -1,4 +1,4 @@
-package com.ant.common.qualifiers
+package com.ant.shared.qualifiers
 
 /**
  * Named qualifier constants for Koin dependency injection of coroutine dispatchers.

@@ -1,4 +1,4 @@
-package com.ant.common.exceptions
+package com.ant.shared.exceptions
 
 /**
  * Represents an error response from a network or domain operation.
