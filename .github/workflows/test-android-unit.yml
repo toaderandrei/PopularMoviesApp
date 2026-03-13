@@ -1,12 +1,7 @@
 name: Test - Android Unit
 
 on:
-  pull_request:
-    paths:
-      - '**/*.kt'
-      - '**/*.kts'
-      - '**/src/main/**'
-      - '**/src/test/**'
+  # Only run manually, not on PRs (PR tests are handled by build-pr.yml)
   workflow_dispatch:
 
 env:
