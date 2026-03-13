@@ -1,7 +1,7 @@
 package com.ant.domain.usecases.login
 
 import app.cash.turbine.test
-import com.ant.common.logger.Logger
+import com.ant.shared.logger.Logger
 import com.ant.models.model.Result
 import com.ant.models.model.UserData
 import com.ant.models.request.RequestType

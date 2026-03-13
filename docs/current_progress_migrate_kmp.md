@@ -145,7 +145,7 @@ class MainActivityViewModelImpl(
 ```
 
 **Architecture:**
-- **Common Interface:** `Logger` in `core:common/src/commonMain`
+- **Common Interface:** `Logger` in `core:shared/src/commonMain`
 - **Android Implementation:** `TmdbLogger` (wraps Timber)
 - **iOS/KMP Implementation:** `KermitLogger` (uses Kermit)
 - **Koin DI:** Provides correct implementation per platform
@@ -450,7 +450,7 @@ Either use this version explicitly or migrate to Material Symbols.
 **Chosen Approach:** **Option B - Fixed iOS Implementation** ✅ SUCCESS!
 
 **Implementation Completed:**
-1. ✅ Used existing common `Logger` interface in `core:common`
+1. ✅ Used existing common `Logger` interface in `core:shared`
 2. ✅ Android uses `TmdbLogger` (Timber wrapper)
 3. ✅ iOS uses `KermitLogger` (Kermit wrapper)
 4. ✅ Platform-specific ViewModel patterns implemented
@@ -555,7 +555,7 @@ Since `ui-test-junit4` doesn't work on iOS:
 
 ### 3. Logger Abstraction Needed for Shared Code
 **Issue:** `TmdbLogger` is Android-specific (Timber)
-**Solution:** Create common `Logger` interface in `core:common`
+**Solution:** Create common `Logger` interface in `core:shared`
 **Implementations:**
 - Android: Timber wrapper
 - iOS: Kermit or NSLog wrapper
@@ -601,7 +601,7 @@ Since `ui-test-junit4` doesn't work on iOS:
 ## 📞 Questions for Discussion
 
 1. ~~**MainApp Strategy:**~~ ✅ **RESOLVED** - Shared across platforms with platform-specific ViewModels
-2. ~~**Logger Abstraction:**~~ ✅ **RESOLVED** - Using existing `Logger` interface from `core:common`
+2. ~~**Logger Abstraction:**~~ ✅ **RESOLVED** - Using existing `Logger` interface from `core:shared`
 3. **iOS Entry Point:** Pure Compose Multiplatform (uses shared MainApp)
 4. **Testing Strategy:** How should we approach platform-specific UI testing?
 5. **Material Symbols:** When should we migrate from Material Icons Extended?

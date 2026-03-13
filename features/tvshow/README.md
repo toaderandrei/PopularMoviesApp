@@ -13,4 +13,4 @@ TV series browsing feature module. Displays popular, top-rated, airing-today, an
 - `tvshow/category/{categoryType}` - Category list
 
 ## Dependencies
-- `core:domain`, `core:models`, `core:ui`, `core:resources`, `core:common`, `core:analytics`
+- `core:domain`, `core:models`, `core:ui`, `core:resources`, `core:shared`, `core:analytics`

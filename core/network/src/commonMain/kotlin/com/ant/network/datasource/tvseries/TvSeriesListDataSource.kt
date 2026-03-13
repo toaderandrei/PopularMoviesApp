@@ -1,6 +1,6 @@
 package com.ant.network.datasource.tvseries
 
-import com.ant.common.exceptions.withRetry
+import com.ant.shared.exceptions.withRetry
 import com.ant.models.entities.TvShow
 import com.ant.models.model.PaginatedResult
 import com.ant.models.request.RequestType

@@ -1,6 +1,6 @@
 package com.ant.datastore.di
 
-import com.ant.common.qualifiers.DispatcherQualifiers
+import com.ant.shared.qualifiers.DispatcherQualifiers
 import com.ant.datastore.factory.PopularMoviesDataStoreFactory
 import com.ant.datastore.session.SessionManagerImpl
 import com.ant.models.session.SessionManager

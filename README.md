@@ -234,50 +234,58 @@ dependencies {
 
 ### Convention Plugins
 
-Custom Gradle convention plugins in `build-logic/convention/`:
+Reusable Gradle build configuration located in `build-logic/convention/`. These plugins auto-configure namespaces, dependencies, and platform targets.
 
-**Android Plugins:**
-- `popular.movies.android.application` - Android application configuration
-- `popular.movies.android.library` - Android library configuration
-- `popular.movies.android.application.compose` - Compose for app modules
-- `popular.movies.android.library.compose` - Compose for library modules
-- `popular.movies.android.feature` - Feature module conventions
-- `popular.movies.android.room` - Room database configuration
-- `popular.movies.android.firebase` - Firebase integration
-- `popular.movies.android.lint` - Lint configuration
-- `popular.movies.android.config` - Build config fields
+**Key Plugins:**
+- **KMP**: `kmp.library`, `kmp.feature`, `kmp.room` - Auto-configure iOS targets, namespaces, Compose
+- **Android**: `android.application`, `android.library`, `android.compose` - Android-specific setup
+- **Special**: `android.firebase`, `android.room`, `android.lint` - Feature-specific configuration
 
-**KMP Plugins:**
-- `popular.movies.kmp.library` - KMP library module (auto-namespace, iOS targets)
-- `popular.movies.kmp.feature` - KMP feature module (auto-namespace, Compose, Koin)
-- `popular.movies.kmp.room` - Room KMP database (auto-KSP for all platforms)
+See `build-logic/convention/src/main/kotlin/` for full implementation details.
 
 ### Gradle Commands
 
+#### Android
+
 ```bash
-# Build the app
-./gradlew assembleDebug
+# Build
+./gradlew assembleDebug          # Debug APK
+./gradlew assembleRelease        # Release APK (requires signing)
+./gradlew bundleRelease          # AAB for Play Store
 
-# Build release APK
-./gradlew assembleRelease
+# Test
+./gradlew test                   # Unit tests
+./gradlew connectedAndroidTest   # Instrumented tests (requires device)
+./gradlew :module:test --tests "TestClass.method"  # Single test
 
-# Run all tests
-./gradlew test
+# Quality
+./gradlew lint                   # Lint check
+./gradlew clean                  # Clean build
+./gradlew dependencyUpdates      # Check for updates
+```
 
-# Run single test
-./gradlew :module:test --tests "TestClass.testMethod"
+#### iOS
 
-# Run connected (instrumented) tests
-./gradlew connectedAndroidTest
+```bash
+# Build Frameworks
+./gradlew :shared:linkDebugFrameworkIosSimulatorArm64    # Simulator (M1)
+./gradlew :shared:linkDebugFrameworkIosArm64             # Device
+./gradlew :shared:linkReleaseFrameworkIosArm64           # Release
 
-# Clean build
-./gradlew clean
+# Build iOS App (requires Xcode)
+cd iosApp
+xcodebuild -scheme PopularMovies -configuration Debug -sdk iphonesimulator
+open PopularMovies.xcodeproj  # Or use Xcode directly
+```
 
-# Lint check
-./gradlew lint
+#### Both Platforms
 
-# Check for dependency updates
-./gradlew dependencyUpdates
+```bash
+# Run all KMP tests
+./gradlew allTests
+
+# Build everything
+./gradlew build
 ```
 
 ## Progress & Status

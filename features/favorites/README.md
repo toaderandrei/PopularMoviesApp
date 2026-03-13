@@ -10,4 +10,4 @@ Favorites management feature module. Displays saved favorite movies and TV shows
 - `favorites` - Main favorites screen (bottom nav tab)
 
 ## Dependencies
-- `core:domain`, `core:models`, `core:ui`, `core:resources`, `core:common`
+- `core:domain`, `core:models`, `core:ui`, `core:resources`, `core:shared`

@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     // Core dependencies
-    commonMainImplementation(projects.core.common)
+    commonMainImplementation(projects.core.shared)
     commonMainImplementation(projects.core.domain)
     commonMainImplementation(projects.core.models)
 
