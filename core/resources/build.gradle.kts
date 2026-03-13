@@ -15,16 +15,14 @@ kotlin {
             @Suppress("OPT_IN_USAGE")
             experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
         }
+}
 
-    sourceSets {
-        commonMain.dependencies {
-            // Compose Runtime (required by Compose compiler)
-            implementation(compose.runtime)
-            // Compose Multiplatform Resources
-            // Note: UI dependencies (material3, icons) should be in core:ui or feature modules
-            api(compose.components.resources)
-        }
-    }
+dependencies {
+    // Compose Runtime (required by Compose compiler)
+    commonMainImplementation(compose.runtime)
+    // Compose Multiplatform Resources
+    // Note: UI dependencies (material3, icons) should be in core:ui or feature modules
+    commonMainApi(compose.components.resources)
 }
 
 // Configure Compose Multiplatform Resources

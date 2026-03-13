@@ -43,7 +43,7 @@ val projects = listOf(
     Project("core/ui"),
     Project("core/resources"),
     Project("core/domain"),
-    Project("core/common"),
+    Project("core/shared"),
     Project("core/network"),
     Project("core/models"),
     Project("core/analytics"),

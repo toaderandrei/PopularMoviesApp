@@ -1,8 +1,8 @@
 package com.ant.ui.di
 
 import com.ant.analytics.di.analyticsModule
-import com.ant.common.di.commonModule
-import com.ant.common.qualifiers.DispatcherQualifiers
+import com.ant.shared.di.commonModule
+import com.ant.shared.qualifiers.DispatcherQualifiers
 import com.ant.data.di.dataModule
 import com.ant.database.di.databaseFactoryModule
 import com.ant.database.di.databaseModule

@@ -10,4 +10,4 @@ Search feature module. Provides debounced search across movies and TV shows with
 - `search` - Search screen (top bar action)
 
 ## Dependencies
-- `core:domain`, `core:models`, `core:ui`, `core:resources`, `core:common`
+- `core:domain`, `core:models`, `core:ui`, `core:resources`, `core:shared`

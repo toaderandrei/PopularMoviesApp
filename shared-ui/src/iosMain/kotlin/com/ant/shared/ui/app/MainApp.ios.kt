@@ -1,7 +1,7 @@
 package com.ant.shared.ui.app
 
 import androidx.compose.runtime.Composable
-import com.ant.common.logger.Logger
+import com.ant.shared.logger.Logger
 import com.ant.models.session.SessionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -1,6 +1,6 @@
 package com.ant.app.application
 
-import com.ant.common.di.Initializer
+import com.ant.shared.di.Initializer
 
 class AppInitializers(
     private val initializers: Set<Initializer>

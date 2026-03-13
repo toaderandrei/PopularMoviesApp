@@ -5,13 +5,6 @@ plugins {
 
 kotlin {
     sourceSets {
-        val androidHostTest by getting {
-            dependencies {
-                implementation(libs.mockK)
-                implementation(libs.turbine)
-            }
-        }
-
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
@@ -20,7 +13,7 @@ kotlin {
 
 dependencies {
     // Core dependencies
-    commonMainApi(projects.core.common)
+    commonMainApi(projects.core.shared)
     commonMainImplementation(projects.core.models)
 
     // Ktor Client (exposed as API for consuming modules)
@@ -37,4 +30,8 @@ dependencies {
     // Platform-specific HTTP engines (Android)
     androidMainImplementation(libs.ktor.client.okhttp)
     androidMainImplementation(libs.okhttp)
+
+    // Testing
+    androidHostTestImplementation(libs.mockK)
+    androidHostTestImplementation(libs.turbine)
 }

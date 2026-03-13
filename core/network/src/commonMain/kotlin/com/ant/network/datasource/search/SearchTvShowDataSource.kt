@@ -1,6 +1,6 @@
 package com.ant.network.datasource.search
 
-import com.ant.common.exceptions.withRetry
+import com.ant.shared.exceptions.withRetry
 import com.ant.models.entities.TvShow
 import com.ant.models.request.RequestType
 import com.ant.network.api.TmdbGenreApi

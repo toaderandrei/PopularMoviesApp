@@ -18,7 +18,7 @@ import com.ant.domain.usecases.tvseries.LoadFavoredTvSeriesUseCase
 import com.ant.domain.usecases.tvseries.SaveTvSeriesDetailsUseCase
 import com.ant.domain.usecases.tvseries.TvSeriesDetailsUseCase
 import com.ant.domain.usecases.tvseries.TvShowListUseCase
-import com.ant.common.qualifiers.DispatcherQualifiers
+import com.ant.shared.qualifiers.DispatcherQualifiers
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 

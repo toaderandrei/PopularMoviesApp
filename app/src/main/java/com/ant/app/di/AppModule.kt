@@ -3,8 +3,8 @@ package com.ant.app.di
 import com.ant.app.application.AppInitializers
 import com.ant.app.application.TimberInitializer
 import com.ant.shared.ui.app.MainActivityViewModelImpl
-import com.ant.common.di.Initializer
-import com.ant.common.logger.TmdbLogger
+import com.ant.shared.di.Initializer
+import com.ant.shared.logger.TmdbLogger
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 

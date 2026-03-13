@@ -13,4 +13,4 @@ Authentication feature module. Handles TMDb account login, guest mode, welcome s
 - `account` - Account profile screen (top bar action)
 
 ## Dependencies
-- `core:domain`, `core:models`, `core:ui`, `core:resources`, `core:common`
+- `core:domain`, `core:models`, `core:ui`, `core:resources`, `core:shared`
