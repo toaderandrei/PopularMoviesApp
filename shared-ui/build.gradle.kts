@@ -10,7 +10,7 @@ plugins {
 dependencies {
     // Core Infrastructure (exposed as API)
     commonMainApi(projects.core.models)
-    commonMainApi(projects.core.common)
+    commonMainApi(projects.core.shared)
     commonMainApi(projects.core.domain)
     commonMainApi(projects.core.data)
     commonMainApi(projects.core.network)

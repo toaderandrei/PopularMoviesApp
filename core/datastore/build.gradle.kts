@@ -16,7 +16,7 @@ kotlin {
 
 dependencies {
     // Core dependencies
-    commonMainImplementation(projects.core.common)
+    commonMainImplementation(projects.core.shared)
     commonMainImplementation(projects.core.models)
 
     // DataStore (exposed as API for consumers to create DataStore instances)

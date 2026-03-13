@@ -20,7 +20,7 @@ kotlin {
 
 dependencies {
     // Core dependencies
-    commonMainApi(projects.core.common)
+    commonMainApi(projects.core.shared)
     commonMainImplementation(projects.core.models)
 
     // Ktor Client (exposed as API for consuming modules)

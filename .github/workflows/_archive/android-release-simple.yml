@@ -1,0 +1,98 @@
+name: Android Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 1.0.3)'
+        required: true
+        type: string
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+
+jobs:
+  build-android:
+    name: Build Android App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Decode google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ ! -z "$GOOGLE_SERVICES_JSON" ]; then
+            echo $GOOGLE_SERVICES_JSON | base64 -di > app/google-services.json
+          else
+            echo "{}" > app/google-services.json  # Dummy file if not set
+          fi
+
+      # Build Release APK (unsigned for now)
+      - name: Build Release APK
+        run: |
+          ./gradlew assembleRelease \
+            -PversionName=${{ inputs.version }}
+
+      # Sign APK (if keystore is configured)
+      - name: Sign APK
+        if: ${{ secrets.SIGNING_KEY_BASE64 != '' }}
+        env:
+          SIGNING_KEY_BASE64: ${{ secrets.SIGNING_KEY_BASE64 }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          # Decode keystore
+          echo "$SIGNING_KEY_BASE64" | base64 -d > release.keystore
+
+          # Find APK
+          APK=$(find app/build/outputs/apk/release -name "*.apk" | head -1)
+
+          # Sign with apksigner
+          $ANDROID_HOME/build-tools/*/apksigner sign \
+            --ks release.keystore \
+            --ks-pass pass:$SIGNING_STORE_PASSWORD \
+            --ks-key-alias $SIGNING_KEY_ALIAS \
+            --key-pass pass:$SIGNING_KEY_PASSWORD \
+            --out app/build/outputs/apk/release/app-release-signed.apk \
+            $APK
+
+          # Clean up
+          rm release.keystore
+
+      # Upload artifacts
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-app-${{ inputs.version }}
+          path: app/build/outputs/apk/release/*.apk
+
+      # Create release
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: "android-v${{ inputs.version }}"
+          name: "Android v${{ inputs.version }}"
+          body: |
+            Android Release v${{ inputs.version }}
+
+            Download the APK below to install.
+          artifacts: "app/build/outputs/apk/release/*.apk"
+          draft: false
+          prerelease: true

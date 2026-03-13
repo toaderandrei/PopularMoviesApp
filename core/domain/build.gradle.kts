@@ -5,7 +5,7 @@ plugins {
 dependencies {
     // Core dependencies
     commonMainImplementation(projects.core.models)
-    commonMainImplementation(projects.core.common)
+    commonMainImplementation(projects.core.shared)
 
     // Test
     androidHostTestImplementation(libs.turbine)

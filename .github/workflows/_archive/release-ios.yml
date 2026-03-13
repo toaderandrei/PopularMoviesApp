@@ -1,0 +1,246 @@
+
+name: iOS Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. 1.0.3)'
+        required: true
+        type: string
+      build_number:
+        description: 'Build number (e.g. 100)'
+        required: true
+        type: string
+      deploy_testflight:
+        description: 'Deploy to TestFlight'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+
+jobs:
+  build-framework:
+    name: Build KMP Framework
+    runs-on: macos-14
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-home-cache-cleanup: true
+          cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
+
+      - name: Cache Kotlin Native
+        uses: actions/cache@v4
+        with:
+          path: ~/.konan
+          key: konan-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
+          restore-keys: |
+            konan-${{ runner.os }}-
+
+      - name: Build iOS Frameworks
+        run: |
+          ./gradlew :shared:embedAndSignAppleFrameworkForXcode \
+            -Pconfiguration.build.type=release \
+            -PversionName=${{ inputs.version }} \
+            -PversionCode=${{ inputs.build_number }}
+
+      - name: Upload Framework Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-frameworks
+          path: |
+            shared/build/outputs/framework/
+
+  build-ios-app:
+    name: Build iOS App
+    needs: build-framework
+    runs-on: macos-14
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Framework Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-frameworks
+          path: shared/build/outputs/framework/
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: iosApp
+
+      - name: Setup CocoaPods
+        uses: maxim-lobanov/setup-cocoapods@v1
+        with:
+          version: latest
+
+      - name: Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: iosApp/Pods
+          key: pods-${{ runner.os }}-${{ hashFiles('iosApp/Podfile.lock') }}
+          restore-keys: |
+            pods-${{ runner.os }}-
+
+      - name: Install CocoaPods dependencies
+        working-directory: iosApp
+        run: |
+          pod install --repo-update
+
+      - name: Setup XcodeGen (if needed)
+        if: hashFiles('iosApp/project.yml') != ''
+        run: brew install xcodegen
+
+      - name: Generate Xcode project (if needed)
+        if: hashFiles('iosApp/project.yml') != ''
+        working-directory: iosApp
+        run: xcodegen generate
+
+      - name: Import Code Signing Certificates
+        if: ${{ inputs.deploy_testflight }}
+        uses: apple-actions/import-codesign-certs@v2
+        with:
+          p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
+          p12-password: ${{ secrets.CERTIFICATES_PASSWORD }}
+
+      - name: Download Provisioning Profiles
+        if: ${{ inputs.deploy_testflight }}
+        uses: apple-actions/download-provisioning-profiles@v2
+        with:
+          bundle-id: ${{ secrets.BUNDLE_ID }}
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+
+      - name: Update Version and Build Number
+        working-directory: iosApp
+        run: |
+          # Update Info.plist or use agvtool
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${{ inputs.version }}" iosApp/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${{ inputs.build_number }}" iosApp/Info.plist
+
+      - name: Build iOS App (Simulator)
+        if: ${{ !inputs.deploy_testflight }}
+        working-directory: iosApp
+        run: |
+          xcodebuild clean build \
+            -workspace PopularMovies.xcworkspace \
+            -scheme PopularMovies \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -derivedDataPath build/DerivedData \
+            ONLY_ACTIVE_ARCH=NO
+
+      - name: Archive iOS App (Device)
+        if: ${{ inputs.deploy_testflight }}
+        working-directory: iosApp
+        run: |
+          xcodebuild archive \
+            -workspace PopularMovies.xcworkspace \
+            -scheme PopularMovies \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath build/PopularMovies.xcarchive \
+            CODE_SIGN_STYLE="Manual" \
+            PROVISIONING_PROFILE_SPECIFIER="${{ secrets.DIST_PROVISIONING_PROFILE_NAME }}" \
+            CODE_SIGN_IDENTITY="iPhone Distribution"
+
+      - name: Export IPA
+        if: ${{ inputs.deploy_testflight }}
+        working-directory: iosApp
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath build/PopularMovies.xcarchive \
+            -exportPath build/IPA \
+            -exportOptionsPlist ExportOptions.plist
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-app-${{ inputs.version }}
+          path: |
+            iosApp/build/IPA/*.ipa
+            iosApp/build/PopularMovies.xcarchive
+
+  deploy-testflight:
+    name: Deploy to TestFlight
+    if: ${{ inputs.deploy_testflight }}
+    needs: build-ios-app
+    runs-on: macos-14
+    steps:
+      - name: Download IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-app-${{ inputs.version }}
+          path: build-artifacts
+
+      - name: Upload to TestFlight
+        uses: Apple-Actions/upload-testflight-build@v1
+        with:
+          app-path: build-artifacts/IPA/PopularMovies.ipa
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+
+  create-github-release:
+    name: Create GitHub Release
+    needs: [build-ios-app]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download iOS Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-app-${{ inputs.version }}
+          path: release-artifacts
+
+      - name: Create Release Tag
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git tag "ios-v${{ inputs.version }}"
+          git push origin "ios-v${{ inputs.version }}"
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: "ios-v${{ inputs.version }}"
+          name: "iOS Release v${{ inputs.version }}"
+          body: |
+            ## iOS Release v${{ inputs.version }}
+
+            Build Number: ${{ inputs.build_number }}
+
+            ### What's Changed
+            - See commit history for changes
+
+            ### Installation
+            - **TestFlight**: Available for beta testers
+            - **IPA**: Download from release assets (requires manual installation)
+          artifacts: "release-artifacts/**/*.ipa"
+          draft: false
+          prerelease: false
