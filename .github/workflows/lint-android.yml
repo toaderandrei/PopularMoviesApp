@@ -1,17 +1,14 @@
 name: Lint - Android
 
 on:
-  pull_request:
-    paths:
-      - '**/*.kt'
-      - '**/*.kts'
-      - '**/*.xml'
+  # Only run on push to main, not on PRs (PR linting is handled by build-pr.yml)
   push:
     branches: [main]
     paths:
       - '**/*.kt'
       - '**/*.kts'
       - '**/*.xml'
+  workflow_dispatch:
 
 jobs:
   lint:
