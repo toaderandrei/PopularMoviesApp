@@ -1,6 +1,7 @@
 package com.ant.domain.di
 
 import com.ant.domain.usecases.favorites.SyncFavoriteToRemoteUseCase
+import com.ant.domain.usecases.favorites.SyncFavoritesFromRemoteUseCase
 import com.ant.domain.usecases.login.LoadAccountProfileUseCase
 import com.ant.domain.usecases.login.LoginUserAndSaveSessionUseCase
 import com.ant.domain.usecases.login.LoginUserToTmDbUseCase
@@ -57,4 +58,5 @@ val domainModule = module {
 
     // Favorites use cases
     factory { SyncFavoriteToRemoteUseCase(get(), get(), get(named(DispatcherQualifiers.IO))) }
+    factory { SyncFavoritesFromRemoteUseCase(get(named(DispatcherQualifiers.IO)), get()) }
 }

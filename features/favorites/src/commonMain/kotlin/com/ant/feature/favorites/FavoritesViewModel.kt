@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ant.domain.usecases.favorites.SyncFavoriteToRemoteUseCase
+import com.ant.domain.usecases.favorites.SyncFavoritesFromRemoteUseCase
 import com.ant.domain.usecases.movies.LoadFavoredMoviesUseCase
 import com.ant.domain.usecases.tvseries.LoadFavoredTvSeriesUseCase
 import com.ant.models.model.Result
@@ -20,13 +21,14 @@ class FavoritesViewModel constructor(
     private val loadFavoredMoviesUseCase: LoadFavoredMoviesUseCase,
     private val loadFavoredTvSeriesUseCase: LoadFavoredTvSeriesUseCase,
     private val syncFavoriteToRemoteUseCase: SyncFavoriteToRemoteUseCase,
+    private val syncFavoritesFromRemoteUseCase: SyncFavoritesFromRemoteUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FavoritesUiState())
     val uiState: StateFlow<FavoritesUiState> = _uiState.asStateFlow()
 
     init {
-        loadFavorites()
+        syncFromRemoteThenLoad()
     }
 
     fun onTabChange(tab: FavoriteTab) {
@@ -34,7 +36,38 @@ class FavoritesViewModel constructor(
     }
 
     fun refresh() {
-        loadFavorites(isRefresh = true)
+        syncFromRemoteThenLoad(isRefresh = true)
+    }
+
+    /**
+     * Syncs favorites from remote backend, then loads them from local DB.
+     * This ensures we have the latest favorites from all devices.
+     */
+    private fun syncFromRemoteThenLoad(isRefresh: Boolean = false) {
+        viewModelScope.launch {
+            if (!isRefresh) {
+                _uiState.update { it.copy(isLoading = true, error = null) }
+            } else {
+                _uiState.update { it.copy(isRefreshing = true, error = null) }
+            }
+
+            // First, sync from remote
+            syncFavoritesFromRemoteUseCase().collect { result ->
+                when (result) {
+                    is Result.Loading -> {
+                        // Keep loading state
+                    }
+                    is Result.Success -> {
+                        // Sync completed, now load from local DB
+                        loadFavorites(isRefresh)
+                    }
+                    is Result.Error -> {
+                        // Sync failed, but still try to load local data
+                        loadFavorites(isRefresh)
+                    }
+                }
+            }
+        }
     }
 
     fun clearSnackbarMessage() {

@@ -131,4 +131,24 @@ class KtorTmdbAuthApi(private val client: HttpClient) : TmdbAuthApi {
             contentType(ContentType.Application.Json)
             setBody(FavoriteRequestBody(mediaType, mediaId, favorite))
         }.body()
+
+    override suspend fun getFavoriteMovies(
+        accountId: Int,
+        sessionId: String,
+        page: Int
+    ): MovieResultsPageDto =
+        client.get("3/account/$accountId/favorite/movies") {
+            parameter("session_id", sessionId)
+            parameter("page", page)
+        }.body()
+
+    override suspend fun getFavoriteTvShows(
+        accountId: Int,
+        sessionId: String,
+        page: Int
+    ): TvShowResultsPageDto =
+        client.get("3/account/$accountId/favorite/tv") {
+            parameter("session_id", sessionId)
+            parameter("page", page)
+        }.body()
 }

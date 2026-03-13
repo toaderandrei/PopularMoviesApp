@@ -11,6 +11,8 @@ import com.ant.network.api.TmdbMoviesApi
 import com.ant.network.api.TmdbSearchApi
 import com.ant.network.api.TmdbTvSeriesApi
 import com.ant.network.api.createTmdbHttpClient
+import com.ant.network.datasource.favorites.FetchFavoriteMoviesDataSource
+import com.ant.network.datasource.favorites.FetchFavoriteTvShowsDataSource
 import com.ant.network.datasource.movies.MovieDetailsExtendedSummaryDataSource
 import com.ant.network.datasource.movies.MovieListDataSource
 import com.ant.network.datasource.movies.SaveAsFavoriteDataSource
@@ -62,4 +64,6 @@ val networkModule = module {
     single { TvSeriesDetailsExtendedSummaryDataSource(get(), get()) }
     single { SearchMovieDataSource(get(), get(), get()) }
     single { SearchTvShowDataSource(get(), get(), get()) }
+    single { FetchFavoriteMoviesDataSource(get()) }
+    single { FetchFavoriteTvShowsDataSource(get()) }
 }

@@ -6,6 +6,7 @@ import com.ant.data.repositories.DefaultMovieRepository
 import com.ant.data.repositories.DefaultSearchRepository
 import com.ant.data.repositories.DefaultTvSeriesRepository
 import com.ant.data.repositories.favorites.FavoriteDetailsToRemoteRepository
+import com.ant.data.repositories.favorites.SyncFavoritesFromRemoteRepository
 import com.ant.data.repositories.favorites.UpdateFavoriteSyncStatusRepository
 import com.ant.data.repositories.login.LoginUserTmDbRepository
 import com.ant.data.repositories.login.LogoutUserAndClearSessionsRepository
@@ -58,11 +59,12 @@ val dataModule = module {
     // Sub-repositories: Favorites
     single { FavoriteDetailsToRemoteRepository(get()) }
     single { UpdateFavoriteSyncStatusRepository(get()) }
+    single { SyncFavoritesFromRemoteRepository(get(), get(), get(), get(), get(), get(), get()) }  // sessionManager, authApi, fetchMoviesDS, fetchTvShowsDS, moviesDb, movieMapper, tvSeriesMapper
 
     // Default repositories (interface bindings)
     single<MovieRepository> { DefaultMovieRepository(get(), get(), get(), get(), get()) }
     single<TvSeriesRepository> { DefaultTvSeriesRepository(get(), get(), get(), get(), get()) }
     single<SearchRepository> { DefaultSearchRepository(get(), get()) }
     single<AuthRepository> { DefaultAuthRepository(get(), get()) }
-    single<FavoriteRepository> { DefaultFavoriteRepository(get(), get()) }
+    single<FavoriteRepository> { DefaultFavoriteRepository(get(), get(), get()) }
 }

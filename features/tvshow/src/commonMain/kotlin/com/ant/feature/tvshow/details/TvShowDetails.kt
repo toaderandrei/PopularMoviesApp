@@ -146,7 +146,7 @@ private fun CollapsingHeaderContent(
                 contentDescription = tvShow.name,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(HEADER_HEIGHT)
+                    .aspectRatio(16f / 9f)
                     .graphicsLayer {
                         translationY = -scrollState.value * 0.5f
                         alpha = 1f - collapseFraction

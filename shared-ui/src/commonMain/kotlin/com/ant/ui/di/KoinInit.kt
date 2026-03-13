@@ -79,6 +79,6 @@ private val viewModelModule = module {
     viewModel { AccountViewModel(get(), get(), get(), get()) }  // LoadAccountProfileUseCase, LogoutUseCase, Analytics, Crashlytics
 
     // Favorites
-    viewModel { FavoritesViewModel(get(), get(), get(), get()) }
+    viewModel { FavoritesViewModel(get(), get(), get(), get(), get()) }  // Added SyncFavoritesFromRemoteUseCase
     viewModel { FavoritesDetailsViewModel(get()) }
 }

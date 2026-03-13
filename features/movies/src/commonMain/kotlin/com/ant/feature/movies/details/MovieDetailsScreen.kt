@@ -147,7 +147,7 @@ private fun CollapsingHeaderContent(
                 contentDescription = movie.name,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(HEADER_HEIGHT)
+                    .aspectRatio(16f / 9f)
                     .graphicsLayer {
                         // Parallax: image scrolls at half speed
                         translationY = -scrollState.value * 0.5f
