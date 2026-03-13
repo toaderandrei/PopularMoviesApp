@@ -95,3 +95,23 @@ fun TvShowCard(
         }
     }
 }
+
+@Composable
+private fun TvShowCardPreview() {
+    MaterialTheme {
+        TvShowCard(
+            tvShow = TvShow(
+                id = 1,
+                name = "Breaking Bad",
+                originalTitle = null,
+                voteCount = null,
+                overview = null,
+                voteAverage = 9.5,
+                backDropPath = null,
+                posterPath = "/path/to/poster.jpg",
+                originalLanguage = null
+            ),
+            onClick = {}
+        )
+    }
+}
