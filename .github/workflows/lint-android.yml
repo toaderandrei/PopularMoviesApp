@@ -1,13 +1,7 @@
 name: Lint - Android
 
 on:
-  # Only run on push to main, not on PRs (PR linting is handled by build-pr.yml)
-  push:
-    branches: [main]
-    paths:
-      - '**/*.kt'
-      - '**/*.kts'
-      - '**/*.xml'
+  workflow_call:
   workflow_dispatch:
 
 jobs:
@@ -19,6 +13,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Decode google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: echo $GOOGLE_SERVICES_JSON | base64 -di > app/google-services.json
 
       - name: Setup JDK 17
         uses: actions/setup-java@v4
