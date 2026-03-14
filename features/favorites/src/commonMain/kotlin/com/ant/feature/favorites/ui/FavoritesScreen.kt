@@ -37,6 +37,7 @@ import com.ant.resources.empty_results
 import com.ant.resources.movies
 import com.ant.resources.tvshow
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -179,6 +180,7 @@ private fun EmptyState(
     }
 }
 
+@Preview
 @Composable
 private fun FavoritesScreenContentPreview() {
     MaterialTheme {
@@ -199,6 +201,7 @@ private fun FavoritesScreenContentPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun FavoritesScreenLoadingPreview() {
     MaterialTheme {
@@ -213,6 +216,7 @@ private fun FavoritesScreenLoadingPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun FavoritesScreenErrorPreview() {
     MaterialTheme {
@@ -227,6 +231,7 @@ private fun FavoritesScreenErrorPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun FavoritesScreenEmptyPreview() {
     MaterialTheme {

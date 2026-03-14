@@ -37,6 +37,7 @@ import com.ant.models.entities.MovieData
 import com.ant.models.request.MovieType
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -171,6 +172,7 @@ private fun categoryTitle(movieType: MovieType): String {
     }
 }
 
+@Preview
 @Composable
 private fun MovieCategoryScreenContentPreview() {
     MaterialTheme {
@@ -194,6 +196,7 @@ private fun MovieCategoryScreenContentPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun MovieCategoryScreenLoadingPreview() {
     MaterialTheme {
@@ -210,6 +213,7 @@ private fun MovieCategoryScreenLoadingPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun MovieCategoryScreenLoadingMorePreview() {
     MaterialTheme {
@@ -232,6 +236,7 @@ private fun MovieCategoryScreenLoadingMorePreview() {
     }
 }
 
+@Preview
 @Composable
 private fun MovieCategoryScreenErrorPreview() {
     MaterialTheme {
@@ -248,6 +253,7 @@ private fun MovieCategoryScreenErrorPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun MovieCategoryScreenEmptyPreview() {
     MaterialTheme {

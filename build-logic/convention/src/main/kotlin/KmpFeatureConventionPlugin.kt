@@ -16,6 +16,11 @@ class KmpFeatureConventionPlugin : Plugin<Project> {
                 apply("org.jetbrains.kotlin.plugin.compose")
             }
 
+            // Compose UI Tooling runtime for preview rendering (outside sourceSets)
+            dependencies {
+                add("androidRuntimeClasspath", libs.findLibrary("androidx.compose.ui.tooling").get())
+            }
+
             extensions.configure<KotlinMultiplatformExtension> {
                 // Auto-configure namespace for feature modules
                 // e.g., :features:movies -> com.ant.feature.movies
@@ -31,6 +36,9 @@ class KmpFeatureConventionPlugin : Plugin<Project> {
                         // Navigation Compose (Mature KMP solution with full iOS support)
                         implementation(libs.findLibrary("navigation.compose.multiplatform").get())
 
+                        // Compose UI Tooling Preview (KMP)
+                        implementation(libs.findLibrary("compose.ui.tooling.preview").get())
+
                         // Koin for KMP
                         implementation(libs.findLibrary("koin.core").get())
                         implementation(libs.findLibrary("koin.compose").get())
@@ -45,9 +53,6 @@ class KmpFeatureConventionPlugin : Plugin<Project> {
                         // Android Lifecycle (Android-only, not available for iOS)
                         implementation(libs.findLibrary("androidx.lifecycle.runtime.compose").get())
                         implementation(libs.findLibrary("androidx.lifecycle.viewmodel.compose").get())
-
-                        // Android Compose UI Tooling
-                        implementation(libs.findLibrary("androidx.compose.ui.tooling.preview").get())
                     }
                 }
             }

@@ -22,6 +22,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import androidx.compose.ui.tooling.preview.Preview
 import com.ant.models.entities.MovieData
 import com.ant.ui.components.RatingBadge
 
@@ -93,5 +94,21 @@ fun MovieCard(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun MovieCardPreview() {
+    MaterialTheme {
+        MovieCard(
+            movie = MovieData(
+                id = 1,
+                name = "Test Movie",
+                posterPath = "",
+                voteAverage = 7.5,
+            ),
+            onClick = {},
+        )
     }
 }

@@ -50,6 +50,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.tooling.preview.Preview
 import coil3.compose.AsyncImage
 import com.ant.models.entities.MovieCast
 import com.ant.models.entities.MovieVideo
@@ -461,6 +462,7 @@ private fun VideoItem(
     }
 }
 
+@Preview
 @Composable
 private fun TvShowDetailsScreenLoadingPreview() {
     MaterialTheme {
@@ -473,6 +475,7 @@ private fun TvShowDetailsScreenLoadingPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun TvShowDetailsScreenContentPreview() {
     MaterialTheme {
@@ -509,6 +512,7 @@ private fun TvShowDetailsScreenContentPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun TvShowDetailsScreenErrorPreview() {
     MaterialTheme {

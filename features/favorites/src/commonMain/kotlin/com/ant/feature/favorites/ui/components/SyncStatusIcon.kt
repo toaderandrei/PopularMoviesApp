@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ant.resources.Res
 import com.ant.resources.sync_local_only
@@ -58,6 +59,7 @@ fun SyncStatusIcon(
     }
 }
 
+@Preview
 @Composable
 private fun SyncStatusIconSyncedPreview() {
     MaterialTheme {
@@ -65,6 +67,7 @@ private fun SyncStatusIconSyncedPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun SyncStatusIconLocalPreview() {
     MaterialTheme {
@@ -72,6 +75,7 @@ private fun SyncStatusIconLocalPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun SyncStatusIconSyncingPreview() {
     MaterialTheme {

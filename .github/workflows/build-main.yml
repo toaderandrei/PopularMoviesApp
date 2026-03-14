@@ -10,94 +10,25 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-  ANDROID_SDK_ROOT: /opt/android-sdk
-
 jobs:
   lint:
     uses: ./.github/workflows/lint-android.yml
     secrets: inherit
 
-  build:
+  buildAndroid:
     needs: lint
-    runs-on: ubuntu-latest
-    env:
-      SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-      SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-      SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+    uses: ./.github/workflows/build-android.yml
+    with:
+      build-type: release
+    secrets: inherit
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Decode google-services.json
-        env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: echo $GOOGLE_SERVICES_JSON | base64 -di > app/google-services.json
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      - name: Cache Android SDK
-        uses: actions/cache@v4
-        with:
-          path: /opt/android-sdk
-          key: android-sdk-${{ runner.os }}-${{ hashFiles('gradle/libs.versions.toml') }}
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle.kts', 'gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: gradle-${{ runner.os }}-
-
-      - name: Decode Keystore
-        env:
-          SIGNING_KEY_BASE64: ${{ secrets.SIGNING_KEY_BASE64 }}
-        run: |
-          mkdir -p $HOME/.android
-          chmod +x $HOME/.android
-          echo "$SIGNING_KEY_BASE64" | base64 -d > $HOME/.android/release.keystore
-
-      - name: Build Release apk
-        run: ./gradlew assembleRelease --stacktrace
-
-      - name: Build Release bundle
-        run: ./gradlew bundleRelease --stacktrace
-
-      - name: Verify APK is signed
-        run: |
-          APK=$(find app/build/outputs/apk/release -name "*.apk" | head -1)
-          if [ -z "$APK" ]; then
-            echo "ERROR: No release APK found"
-            exit 1
-          fi
-          APKSIGNER=$(find $ANDROID_SDK_ROOT/build-tools -name "apksigner" | sort -V | tail -1)
-          $APKSIGNER verify --print-certs "$APK" || {
-            echo "ERROR: Release APK is NOT signed!"
-            exit 1
-          }
-          echo "APK is properly signed: $APK"
-
-      - name: Upload Release Build to Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-artifacts
-          path: |
-            app/build/outputs/apk/release/*.apk
-            app/build/outputs/bundle/release/*.aab
+  buildIos:
+    needs: lint
+    uses: ./.github/workflows/build-ios.yml
+    secrets: inherit
 
   test:
-    needs: build
+    needs: [buildAndroid, buildIos]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -113,6 +44,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
+          cache: 'gradle'
 
       - name: Cache Android SDK
         uses: actions/cache@v4
@@ -122,15 +54,6 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle.kts', 'gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: gradle-${{ runner.os }}-
 
       - name: Run Tests
         run: ./gradlew test
