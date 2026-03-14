@@ -1,0 +1,23 @@
+name: Build iOS
+
+on:
+  workflow_call:
+
+jobs:
+  buildIos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'gradle'
+
+      - name: Build iOS Frameworks
+        run: |
+          ./gradlew :shared:linkDebugFrameworkIosSimulatorArm64 --stacktrace
+          ./gradlew :shared:linkDebugFrameworkIosArm64 --stacktrace
