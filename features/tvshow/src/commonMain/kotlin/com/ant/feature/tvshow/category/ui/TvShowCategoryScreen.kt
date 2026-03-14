@@ -37,6 +37,7 @@ import com.ant.models.entities.TvShow
 import com.ant.models.request.TvShowType
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -171,6 +172,7 @@ private fun categoryTitle(tvShowType: TvShowType): String {
     }
 }
 
+@Preview
 @Composable
 private fun TvShowCategoryScreenContentPreview() {
     MaterialTheme {
@@ -194,6 +196,7 @@ private fun TvShowCategoryScreenContentPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun TvShowCategoryScreenLoadingPreview() {
     MaterialTheme {
@@ -210,6 +213,7 @@ private fun TvShowCategoryScreenLoadingPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun TvShowCategoryScreenLoadingMorePreview() {
     MaterialTheme {
@@ -232,6 +236,7 @@ private fun TvShowCategoryScreenLoadingMorePreview() {
     }
 }
 
+@Preview
 @Composable
 private fun TvShowCategoryScreenErrorPreview() {
     MaterialTheme {
@@ -248,6 +253,7 @@ private fun TvShowCategoryScreenErrorPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun TvShowCategoryScreenEmptyPreview() {
     MaterialTheme {

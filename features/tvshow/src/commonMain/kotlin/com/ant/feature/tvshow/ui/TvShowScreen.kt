@@ -24,6 +24,7 @@ import com.ant.feature.tvshow.TvShowUiState
 import com.ant.feature.tvshow.ui.components.TvShowSectionRow
 import com.ant.models.entities.TvShow
 import com.ant.models.request.TvShowType
+import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * TV Shows screen - displays multiple sections of TV shows in vertical scroll
@@ -165,6 +166,7 @@ private fun formatCategoryTitle(category: TvShowType): String {
     }
 }
 
+@Preview
 @Composable
 private fun TvShowScreenPreview() {
     MaterialTheme {
@@ -223,6 +225,7 @@ private fun TvShowScreenPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun TvShowScreenLoadingPreview() {
     MaterialTheme {

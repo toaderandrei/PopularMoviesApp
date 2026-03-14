@@ -55,6 +55,7 @@ import com.ant.models.entities.MovieCast
 import com.ant.models.entities.MovieData
 import com.ant.models.entities.MovieDetails
 import com.ant.models.entities.MovieVideo
+import androidx.compose.ui.tooling.preview.Preview
 
 private const val TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
 private const val TMDB_BACKDROP_BASE_URL = "https://image.tmdb.org/t/p/w1280"
@@ -442,6 +443,7 @@ private fun VideoItem(
     }
 }
 
+@Preview
 @Composable
 private fun MovieDetailsScreenLoadingPreview() {
     MaterialTheme {
@@ -454,6 +456,7 @@ private fun MovieDetailsScreenLoadingPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun MovieDetailsScreenContentPreview() {
     MaterialTheme {
@@ -488,6 +491,7 @@ private fun MovieDetailsScreenContentPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun MovieDetailsScreenErrorPreview() {
     MaterialTheme {

@@ -11,8 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.MaterialTheme
 import coil3.compose.AsyncImage
 import com.ant.models.entities.TvShow
+import androidx.compose.ui.tooling.preview.Preview
 
 private const val TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
 
@@ -36,6 +38,22 @@ fun TvShowPosterCard(
                 .aspectRatio(2f / 3f)
                 .clip(RoundedCornerShape(8.dp)),
             contentScale = ContentScale.Crop,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TvShowPosterCardPreview() {
+    MaterialTheme {
+        TvShowPosterCard(
+            tvShow = TvShow(
+                id = 1,
+                name = "Test TV Show",
+                posterPath = "",
+                voteAverage = 8.0,
+            ),
+            onClick = {},
         )
     }
 }

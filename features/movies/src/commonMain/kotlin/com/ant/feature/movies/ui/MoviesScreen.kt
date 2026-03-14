@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ant.feature.movies.MovieSection
 import com.ant.feature.movies.MoviesUiState
@@ -169,6 +170,7 @@ private fun formatCategoryTitle(category: MovieType): String {
     }
 }
 
+@Preview
 @Composable
 private fun MoviesScreenPreview() {
     MaterialTheme {
@@ -218,6 +220,7 @@ private fun MoviesScreenPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun MoviesScreenLoadingPreview() {
     MaterialTheme {
