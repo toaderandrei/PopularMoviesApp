@@ -225,7 +225,7 @@ private fun MoviesScreenPreview() {
 private fun MoviesScreenLoadingPreview() {
     MaterialTheme {
         MoviesScreen(
-            uiState = MoviesUiState(isLoading = true),
+            uiState = MoviesUiState(),
             onMovieClick = {},
             onMoreClick = {},
             onRefresh = {}

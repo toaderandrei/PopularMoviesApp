@@ -31,7 +31,7 @@ class TvSeriesDetailsMapper(
         val castList = from.credits?.cast?.map { cast ->
             MovieCast(
                 movieId = tvSeries.id,
-                creditId = from.credits?.id,
+                creditId = from.credits.id,
                 cast_id = cast.castId,
                 name = cast.name,
                 order = cast.order,
@@ -42,7 +42,7 @@ class TvSeriesDetailsMapper(
         val crewList = from.credits?.crew?.map { crew ->
             MovieCrew(
                 movieId = tvSeries.id,
-                creditsId = from.credits?.id,
+                creditsId = from.credits.id,
                 name = crew.name,
                 job = crew.job,
                 profilePath = crew.profilePath,

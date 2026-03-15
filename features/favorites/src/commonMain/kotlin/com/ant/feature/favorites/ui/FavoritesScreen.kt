@@ -206,7 +206,7 @@ private fun FavoritesScreenContentPreview() {
 private fun FavoritesScreenLoadingPreview() {
     MaterialTheme {
         FavoritesScreen(
-            uiState = FavoritesUiState(isLoading = true),
+            uiState = FavoritesUiState(isMoviesLoading = true, isTvShowsLoading = true),
             onMovieClick = {},
             onTvShowClick = {},
             onTabChange = {},

@@ -1,34 +1,26 @@
 package com.ant.network.datasource.tvseries
 
-import com.ant.shared.exceptions.withRetry
 import com.ant.models.entities.TvShowDetails
 import com.ant.models.request.RequestType
 import com.ant.models.request.TvSeriesAppendToResponseItem
-import com.ant.network.api.TmdbTvSeriesApi
+import com.ant.network.dto.TvShowDto
+import com.ant.network.ktx.safeResourceGet
 import com.ant.network.mappers.tvseries.TvSeriesDetailsMapper
+import com.ant.network.resources.TvSeriesResources
+import io.ktor.client.HttpClient
 
-/**
- * Fetches extended TV series details (including credits, videos) from the TMDb API
- * and maps the response to a domain [TvShowDetails] model.
- */
 class TvSeriesDetailsExtendedSummaryDataSource(
-    private val tvSeriesApi: TmdbTvSeriesApi,
+    private val client: HttpClient,
     private val tvSeriesDetailsMapper: TvSeriesDetailsMapper,
 ) {
-    /**
-     * Fetches and maps TV series details for the show specified in [params].
-     *
-     * @param params contains the TMDb TV series ID and the list of append-to-response items.
-     * @return mapped [TvShowDetails] domain model.
-     */
     suspend operator fun invoke(params: RequestType.TvSeriesRequestDetails): TvShowDetails {
         val appendStr = params.appendToResponseItems.joinToString(",") { it.toApiString() }
-        val tvShowDto = withRetry {
-            tvSeriesApi.getDetails(
-                tvSeriesId = params.tmdbTvSeriesId.toInt(),
-                appendToResponse = appendStr.ifEmpty { null },
+        val tvShowDto: TvShowDto = client.safeResourceGet(
+            TvSeriesResources.Details(
+                id = params.tmdbTvSeriesId.toInt(),
+                append_to_response = appendStr.ifEmpty { null },
             )
-        }
+        )
         return tvSeriesDetailsMapper.map(tvShowDto)
     }
 }

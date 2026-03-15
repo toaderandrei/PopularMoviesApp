@@ -1,19 +1,25 @@
 package com.ant.network.datasource.favorites
 
-import com.ant.network.api.TmdbAuthApi
 import com.ant.network.dto.TvShowResultsPageDto
+import com.ant.network.ktx.safeResourceGet
+import com.ant.network.resources.AccountResources
+import io.ktor.client.HttpClient
 
-/**
- * Data source for fetching favorite TV shows from TMDb backend.
- */
 class FetchFavoriteTvShowsDataSource(
-    private val authApi: TmdbAuthApi
+    private val client: HttpClient,
 ) {
     suspend fun fetchFavoriteTvShows(
         accountId: Int,
         sessionId: String,
-        page: Int = 1
+        page: Int = 1,
     ): TvShowResultsPageDto {
-        return authApi.getFavoriteTvShows(accountId, sessionId, page)
+        return client.safeResourceGet(
+            resource = AccountResources.FavoriteTvShows(
+                accountId = accountId,
+                session_id = sessionId,
+                page = page,
+            ),
+            maxAttempts = 1,
+        )
     }
 }

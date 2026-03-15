@@ -230,7 +230,7 @@ private fun TvShowScreenPreview() {
 private fun TvShowScreenLoadingPreview() {
     MaterialTheme {
         TvShowScreen(
-            uiState = TvShowUiState(isLoading = true),
+            uiState = TvShowUiState(),
             onTvShowClick = {},
             onMoreClick = {},
             onRefresh = {}

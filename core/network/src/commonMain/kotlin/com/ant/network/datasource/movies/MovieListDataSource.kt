@@ -1,39 +1,30 @@
 package com.ant.network.datasource.movies
 
-import com.ant.shared.exceptions.withRetry
 import com.ant.models.entities.MovieData
 import com.ant.models.model.PaginatedResult
 import com.ant.models.request.MovieType
 import com.ant.models.request.RequestType
-import com.ant.network.api.TmdbGenreApi
-import com.ant.network.api.TmdbMoviesApi
+import com.ant.network.dto.GenreResultsDto
+import com.ant.network.dto.MovieResultsPageDto
+import com.ant.network.ktx.safeResourceGet
 import com.ant.network.mappers.movies.MoviesListMapper
+import com.ant.network.resources.GenreResources
+import com.ant.network.resources.MovieResources
+import io.ktor.client.HttpClient
 
-/**
- * Fetches a paginated list of movies by category (popular, top-rated, etc.) from the TMDb API
- * and maps the results to domain [MovieData] models.
- */
 class MovieListDataSource(
-    private val moviesApi: TmdbMoviesApi,
-    private val genreApi: TmdbGenreApi,
+    private val client: HttpClient,
     private val moviesListMapper: MoviesListMapper,
 ) {
-    /**
-     * Fetches movies for the category and page specified in [params].
-     *
-     * @return paginated result of mapped [MovieData] domain models.
-     */
     suspend operator fun invoke(params: RequestType.MovieRequest): PaginatedResult<MovieData> {
-        val movieResults = withRetry {
-            when (params.movieType) {
-                MovieType.POPULAR -> moviesApi.getPopular(params.page)
-                MovieType.TOP_RATED -> moviesApi.getTopRated(params.page)
-                MovieType.NOW_PLAYING -> moviesApi.getNowPlaying(params.page)
-                MovieType.UPCOMING -> moviesApi.getUpcoming(params.page)
-            }
+        val movieResults: MovieResultsPageDto = when (params.movieType) {
+            MovieType.POPULAR -> client.safeResourceGet(MovieResources.Popular(page = params.page))
+            MovieType.TOP_RATED -> client.safeResourceGet(MovieResources.TopRated(page = params.page))
+            MovieType.NOW_PLAYING -> client.safeResourceGet(MovieResources.NowPlaying(page = params.page))
+            MovieType.UPCOMING -> client.safeResourceGet(MovieResources.Upcoming(page = params.page))
         }
 
-        val genres = genreApi.getMovieGenres()
+        val genres: GenreResultsDto = client.safeResourceGet(GenreResources.MovieGenres())
         return moviesListMapper.map(Pair(movieResults, genres))
     }
 }

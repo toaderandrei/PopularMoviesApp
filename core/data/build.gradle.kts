@@ -12,4 +12,5 @@ dependencies {
     // Testing
     androidHostTestImplementation(libs.mockK)
     androidHostTestImplementation(libs.turbine)
+    androidHostTestImplementation(libs.ktor.client.mock)
 }

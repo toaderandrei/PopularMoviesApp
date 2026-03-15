@@ -3,11 +3,14 @@ package com.ant.data.repositories.favorites
 import com.ant.database.database.MoviesDb
 import com.ant.database.mapper.toEntity
 import com.ant.models.session.SessionManager
-import com.ant.network.api.TmdbAuthApi
 import com.ant.network.datasource.favorites.FetchFavoriteMoviesDataSource
 import com.ant.network.datasource.favorites.FetchFavoriteTvShowsDataSource
+import com.ant.network.dto.AccountDto
+import com.ant.network.ktx.safeResourceGet
 import com.ant.network.mappers.movies.MovieDataMapper
 import com.ant.network.mappers.tvseries.TvSeriesDataMapper
+import com.ant.network.resources.AccountResources
+import io.ktor.client.HttpClient
 
 /**
  * Repository for syncing favorites from the remote TMDb account to the local database.
@@ -20,7 +23,7 @@ import com.ant.network.mappers.tvseries.TvSeriesDataMapper
  */
 class SyncFavoritesFromRemoteRepository(
     private val sessionManager: SessionManager,
-    private val authApi: TmdbAuthApi,
+    private val client: HttpClient,
     private val fetchFavoriteMoviesDataSource: FetchFavoriteMoviesDataSource,
     private val fetchFavoriteTvShowsDataSource: FetchFavoriteTvShowsDataSource,
     private val moviesDb: MoviesDb,
@@ -31,7 +34,10 @@ class SyncFavoritesFromRemoteRepository(
         val sessionId = sessionManager.getSessionId() ?: return
 
         // Get account ID from TMDb
-        val account = authApi.getAccountDetails(sessionId)
+        val account: AccountDto = client.safeResourceGet(
+            resource = AccountResources(session_id = sessionId),
+            maxAttempts = 1,
+        )
         val accountId = account.id ?: return
 
         // Sync favorite movies
@@ -55,7 +61,7 @@ class SyncFavoritesFromRemoteRepository(
 
             // Get current local favorites
             val localFavorites = moviesDb.moviesDao().loadFavoredMovies(favored = true)
-            val localFavoriteIds = localFavorites.map { it.id.toLong() }.toSet()
+            val localFavoriteIds = localFavorites.map { it.id }.toSet()
 
             // 1. Add remote favorites that aren't in local DB
             val missingInLocal = remoteFavorites.filter { it.id !in localFavoriteIds }
@@ -70,9 +76,9 @@ class SyncFavoritesFromRemoteRepository(
             existingInBoth.forEach { id ->
                 moviesDb.moviesDao().updateSyncStatus(id, synced = true)
             }
-        } catch (e: Exception) {
-            // Log error but don't throw - allow partial sync
-            e.printStackTrace()
+        } catch (e: Throwable) {
+            // Log error but don't throw - allow partial sync (catches NetworkError + Exception)
+            //todo log it and chekc what to do with it
         }
     }
 
@@ -90,7 +96,7 @@ class SyncFavoritesFromRemoteRepository(
 
             // Get current local favorites
             val localFavorites = moviesDb.tvSeriesDao().loadFavoredTvSeriesData(favored = true)
-            val localFavoriteIds = localFavorites.map { it.id.toLong() }.toSet()
+            val localFavoriteIds = localFavorites.map { it.id }.toSet()
 
             // 1. Add remote favorites that aren't in local DB
             val missingInLocal = remoteFavorites.filter { it.id !in localFavoriteIds }
@@ -105,9 +111,9 @@ class SyncFavoritesFromRemoteRepository(
             existingInBoth.forEach { id ->
                 moviesDb.tvSeriesDao().updateSyncStatus(id, synced = true)
             }
-        } catch (e: Exception) {
-            // Log error but don't throw - allow partial sync
-            e.printStackTrace()
+        } catch (e: Throwable) {
+            // Log error but don't throw - allow partial sync (catches NetworkError + Exception)
+           // todo log it and decide what to do with it
         }
     }
 }

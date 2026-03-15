@@ -2,7 +2,7 @@ package com.ant.models.entities
 
 import com.ant.models.extensions.toFormattedDateString
 import com.ant.models.extensions.toTwoDigitNumber
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 /**
  * Domain model representing a movie with its metadata, ratings, and favorite status.
@@ -26,7 +26,8 @@ data class MovieData(
 
     val backDropPath: String? = null,
 
-    val _releaseDate: Instant? = null,
+    val _releaseDate:
+    Instant? = null,
 
     val voteAverage: Double? = null,
 

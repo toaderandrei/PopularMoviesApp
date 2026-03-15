@@ -31,7 +31,7 @@ actual class MoviesDatabaseFactory(
             name = "tmdb_movies.db"
         )
             .addMigrations(MIGRATION_40_41)
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(false)
             .build()
     }
 }

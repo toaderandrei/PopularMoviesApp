@@ -1,6 +1,6 @@
 package com.ant.models.extensions
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 /**
  * Formats this [Instant] as a human-readable date string.

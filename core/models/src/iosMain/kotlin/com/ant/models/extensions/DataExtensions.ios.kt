@@ -1,6 +1,6 @@
 package com.ant.models.extensions
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -14,8 +14,8 @@ actual fun Instant.toFormattedDateString(useDifferentFormat: Boolean): String? {
     return try {
         if (useDifferentFormat) {
             val localDateTime = this.toLocalDateTime(TimeZone.currentSystemDefault())
-            "${localDateTime.dayOfMonth.toString().padStart(2, '0')}-" +
-                "${localDateTime.monthNumber.toString().padStart(2, '0')}-" +
+            "${localDateTime.day.toString().padStart(2, '0')}-" +
+                "${localDateTime.month.toString().padStart(2, '0')}-" +
                 "${localDateTime.year}"
         } else {
             this.toString()
