@@ -2,7 +2,7 @@ package com.ant.models.entities
 
 import com.ant.models.extensions.toFormattedDateString
 import com.ant.models.extensions.toTwoDigitNumber
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 /**
  * Domain model representing a TV show with its metadata, ratings, and favorite status.

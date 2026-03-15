@@ -42,6 +42,7 @@ import com.ant.resources.user_login_avatar
 import com.ant.resources.username_account
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun AccountRoute(
@@ -218,6 +219,7 @@ private fun NotLoggedInContent(
     }
 }
 
+@Preview
 @Composable
 private fun AccountScreenLoggedInPreview() {
     MaterialTheme {
@@ -235,6 +237,7 @@ private fun AccountScreenLoggedInPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun AccountScreenNotLoggedInPreview() {
     MaterialTheme {
@@ -250,6 +253,7 @@ private fun AccountScreenNotLoggedInPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun AccountScreenLoadingPreview() {
     MaterialTheme {

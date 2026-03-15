@@ -2,7 +2,7 @@ package com.ant.database.converters
 
 import androidx.room.TypeConverter
 import com.ant.models.extensions.toInstant
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

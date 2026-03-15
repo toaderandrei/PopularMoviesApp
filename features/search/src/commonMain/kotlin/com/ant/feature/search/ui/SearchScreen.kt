@@ -48,6 +48,7 @@ import com.ant.resources.search_prompt
 import com.ant.resources.search_tab_movies
 import com.ant.resources.search_tab_tv_shows
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -237,6 +238,7 @@ private fun EmptyState(
     }
 }
 
+@Preview
 @Composable
 private fun SearchScreenContentPreview() {
     MaterialTheme {
@@ -259,6 +261,7 @@ private fun SearchScreenContentPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun SearchScreenEmptyQueryPreview() {
     MaterialTheme {
@@ -274,6 +277,7 @@ private fun SearchScreenEmptyQueryPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun SearchScreenLoadingPreview() {
     MaterialTheme {
@@ -292,6 +296,7 @@ private fun SearchScreenLoadingPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun SearchScreenErrorPreview() {
     MaterialTheme {
@@ -310,6 +315,7 @@ private fun SearchScreenErrorPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun SearchScreenNoResultsPreview() {
     MaterialTheme {

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ant.models.entities.TvShow
 import com.ant.ui.components.RatingBadge
+import androidx.compose.ui.tooling.preview.Preview
 
 private const val TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
 
@@ -96,6 +97,7 @@ fun TvShowCard(
     }
 }
 
+@Preview
 @Composable
 private fun TvShowCardPreview() {
     MaterialTheme {

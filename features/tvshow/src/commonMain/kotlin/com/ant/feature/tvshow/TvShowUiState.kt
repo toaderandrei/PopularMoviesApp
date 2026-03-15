@@ -7,11 +7,13 @@ import com.ant.models.request.TvShowType
  * UI state for the TV Shows screen
  */
 data class TvShowUiState(
-    val isLoading: Boolean = false,
     val tvShowSections: Map<TvShowType, TvShowSection> = emptyMap(),
     val error: String? = null,
     val isRefreshing: Boolean = false,
-)
+) {
+    val isLoading: Boolean
+        get() = tvShowSections.size < 4 || tvShowSections.values.any { it.isLoading }
+}
 
 /**
  * Represents a section of TV shows for a specific category

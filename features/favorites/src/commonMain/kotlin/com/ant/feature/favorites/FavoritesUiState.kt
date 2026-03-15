@@ -7,7 +7,8 @@ import com.ant.models.entities.TvShow
  * UI state for the Favorites screen
  */
 data class FavoritesUiState(
-    val isLoading: Boolean = false,
+    val isMoviesLoading: Boolean = false,
+    val isTvShowsLoading: Boolean = false,
     val favoriteMovies: List<MovieData> = emptyList(),
     val favoriteTvShows: List<TvShow> = emptyList(),
     val selectedTab: FavoriteTab = FavoriteTab.MOVIES,
@@ -15,7 +16,10 @@ data class FavoritesUiState(
     val isRefreshing: Boolean = false,
     val syncingIds: Set<Long> = emptySet(),
     val snackbarMessage: String? = null,
-)
+) {
+    val isLoading: Boolean
+        get() = isMoviesLoading || isTvShowsLoading
+}
 
 enum class FavoriteTab {
     MOVIES,

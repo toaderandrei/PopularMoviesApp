@@ -6,6 +6,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 class KmpLibraryConventionPlugin : Plugin<Project> {
@@ -45,7 +46,14 @@ class KmpLibraryConventionPlugin : Plugin<Project> {
                 }
             }
 
-            // Configure JVM target for all Kotlin compilation tasks
+            // Add -Xexpect-actual-classes to all Kotlin compilation tasks (including metadata)
+            tasks.withType<KotlinCompilationTask<*>>().configureEach {
+                compilerOptions {
+                    freeCompilerArgs.add("-Xexpect-actual-classes")
+                }
+            }
+
+            // Configure JVM target for JVM/Android Kotlin compilation tasks
             tasks.withType<KotlinCompile>().configureEach {
                 compilerOptions {
                     jvmTarget.set(JvmTarget.JVM_17)

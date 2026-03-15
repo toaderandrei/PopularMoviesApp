@@ -1,17 +1,27 @@
 package com.ant.data.repositories.login
 
+import com.ant.common.exceptions.NetworkError
 import com.ant.models.model.UserData
 import com.ant.models.request.RequestType
-import com.ant.network.api.TmdbAuthApi
+import com.ant.network.dto.CreateSessionBody
+import com.ant.network.dto.RequestTokenDto
+import com.ant.network.dto.SessionDto
+import com.ant.network.dto.ValidateTokenBody
+import com.ant.network.ktx.safeResourceGet
+import com.ant.network.ktx.safeResourcePost
 import com.ant.network.mappers.login.LoginSessionMapper
-
+import com.ant.network.resources.AuthResources
+import io.ktor.client.HttpClient
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 
 /**
  * Authenticates a user against TMDb using the three-step token flow:
  * request token -> validate with credentials -> create session.
  */
-class LoginUserTmDbRepository constructor(
-    private val authApi: TmdbAuthApi,
+class LoginUserTmDbRepository(
+    private val client: HttpClient,
     private val loginSessionMapper: LoginSessionMapper,
 ) {
     /**
@@ -20,22 +30,43 @@ class LoginUserTmDbRepository constructor(
      * @return [UserData] containing the session ID and username.
      */
     suspend fun performRequest(params: RequestType.LoginSessionRequest.WithCredentials): UserData {
-        // First we need to request a token.
-        val tokenResponse = authApi.createRequestToken()
-
-        // Next we need to validate the token, username and password.
-        val validate = authApi.validateTokenWithLogin(
-            username = params.username,
-            password = params.password ?: error("Password is required for login"),
-            requestToken = tokenResponse.requestToken ?: error("Request token was null"),
+        // Step 1: Request token
+        val tokenResponse: RequestTokenDto = client.safeResourceGet(
+            resource = AuthResources.CreateToken(),
+            maxAttempts = 1,
         )
 
-        // If successful we fetch the session.
-        val accountSession = authApi.createSession(
-            requestToken = validate.requestToken ?: error("Validated token was null"),
-        )
+        val requestToken = tokenResponse.requestToken
+            ?: throw NetworkError.Unknown(message = "Request token was null")
 
-        // If successful we return the session.
+        // Step 2: Validate with credentials — 401 = wrong password
+        val validate: RequestTokenDto = client.safeResourcePost(
+            resource = AuthResources.ValidateToken(),
+            maxAttempts = 1,
+        ) {
+            contentType(ContentType.Application.Json)
+            setBody(
+                ValidateTokenBody(
+                    username = params.username,
+                    password = params.password
+                        ?: throw NetworkError.Unknown(message = "Password is required for login"),
+                    requestToken = requestToken,
+                )
+            )
+        }
+
+        val validatedToken = validate.requestToken
+            ?: throw NetworkError.Unknown(message = "Validated token was null")
+
+        // Step 3: Create session
+        val accountSession: SessionDto = client.safeResourcePost(
+            resource = AuthResources.CreateSession(),
+            maxAttempts = 1,
+        ) {
+            contentType(ContentType.Application.Json)
+            setBody(CreateSessionBody(validatedToken))
+        }
+
         val session = loginSessionMapper.map(accountSession)
         return session.copy(username = params.username)
     }

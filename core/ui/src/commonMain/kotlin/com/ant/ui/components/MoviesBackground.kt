@@ -1,6 +1,8 @@
 package com.ant.ui.components
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -11,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * The main background for the app.
@@ -51,3 +54,13 @@ data class BackgroundTheme(
  * A composition local for [BackgroundTheme].
  */
 val LocalBackgroundTheme = staticCompositionLocalOf { BackgroundTheme() }
+
+@Preview
+@Composable
+private fun MoviesBackgroundPreview() {
+    MaterialTheme {
+        MoviesBackground {
+            Text("Content")
+        }
+    }
+}

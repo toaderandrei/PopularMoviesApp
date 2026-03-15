@@ -9,6 +9,7 @@ import com.ant.domain.usecases.movies.LoadFavoredMoviesUseCase
 import com.ant.domain.usecases.tvseries.LoadFavoredTvSeriesUseCase
 import com.ant.models.model.Result
 import com.ant.models.request.FavoriteType
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +27,7 @@ class FavoritesViewModel constructor(
 
     private val _uiState = MutableStateFlow(FavoritesUiState())
     val uiState: StateFlow<FavoritesUiState> = _uiState.asStateFlow()
+    private var loadingJobs = mutableListOf<Job>()
 
     init {
         syncFromRemoteThenLoad()
@@ -44,11 +46,14 @@ class FavoritesViewModel constructor(
      * This ensures we have the latest favorites from all devices.
      */
     private fun syncFromRemoteThenLoad(isRefresh: Boolean = false) {
-        viewModelScope.launch {
+        loadingJobs.forEach { it.cancel() }
+        loadingJobs.clear()
+
+        loadingJobs += viewModelScope.launch {
             if (!isRefresh) {
-                _uiState.update { it.copy(isLoading = true, error = null) }
+                _uiState.update { it.copy(isMoviesLoading = true, isTvShowsLoading = true, error = null) }
             } else {
-                _uiState.update { it.copy(isRefreshing = true, error = null) }
+                _uiState.update { it.copy(isMoviesLoading = true, isTvShowsLoading = true, isRefreshing = true, error = null) }
             }
 
             // First, sync from remote
@@ -111,13 +116,13 @@ class FavoritesViewModel constructor(
     }
 
     private fun loadFavorites(isRefresh: Boolean = false) {
-        viewModelScope.launch {
-            if (!isRefresh) {
-                _uiState.update { it.copy(isLoading = true, error = null) }
-            } else {
-                _uiState.update { it.copy(isRefreshing = true, error = null) }
-            }
+        if (!isRefresh) {
+            _uiState.update { it.copy(isMoviesLoading = true, isTvShowsLoading = true, error = null) }
+        } else {
+            _uiState.update { it.copy(isMoviesLoading = true, isTvShowsLoading = true, isRefreshing = true, error = null) }
+        }
 
+        loadingJobs += viewModelScope.launch {
             // Load favorite movies
             loadFavoredMoviesUseCase(true).collect { result ->
                 when (result) {
@@ -128,6 +133,7 @@ class FavoritesViewModel constructor(
                     is Result.Success -> {
                         _uiState.update {
                             it.copy(
+                                isMoviesLoading = false,
                                 favoriteMovies = result.data,
                                 error = null
                             )
@@ -137,13 +143,16 @@ class FavoritesViewModel constructor(
                     is Result.Error -> {
                         _uiState.update {
                             it.copy(
+                                isMoviesLoading = false,
                                 error = result.throwable.message ?: "Failed to load favorite movies"
                             )
                         }
                     }
                 }
             }
+        }
 
+        loadingJobs += viewModelScope.launch {
             // Load favorite TV shows
             loadFavoredTvSeriesUseCase(true).collect { result ->
                 when (result) {
@@ -154,7 +163,7 @@ class FavoritesViewModel constructor(
                     is Result.Success -> {
                         _uiState.update {
                             it.copy(
-                                isLoading = false,
+                                isTvShowsLoading = false,
                                 isRefreshing = false,
                                 favoriteTvShows = result.data,
                                 error = null
@@ -165,7 +174,7 @@ class FavoritesViewModel constructor(
                     is Result.Error -> {
                         _uiState.update {
                             it.copy(
-                                isLoading = false,
+                                isTvShowsLoading = false,
                                 isRefreshing = false,
                                 error = result.throwable.message ?: "Failed to load favorite TV shows"
                             )

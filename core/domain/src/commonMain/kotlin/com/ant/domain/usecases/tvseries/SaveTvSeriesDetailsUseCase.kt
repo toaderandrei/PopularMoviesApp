@@ -1,5 +1,6 @@
 package com.ant.domain.usecases.tvseries
 
+import com.ant.common.exceptions.NetworkError
 import com.ant.domain.repositories.FavoriteRepository
 import com.ant.domain.repositories.TvSeriesRepository
 import com.ant.domain.usecases.resultFlow
@@ -46,8 +47,10 @@ class SaveTvSeriesDetailsUseCase constructor(
                                     synced = true,
                                 )
                             }
-                        } catch (_: Exception) {
-                            // Remote sync failed; favorite is saved locally with syncedToRemote=false
+                        } catch (e: NetworkError.Unauthorized) {
+                            throw e  // Propagate — user needs to re-login
+                        } catch (_: NetworkError) {
+                            // Transient failure — saved locally, will sync later
                         }
                     }
                 }

@@ -3,6 +3,7 @@ package com.ant.network.api
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.resources.Resources
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
@@ -28,6 +29,10 @@ expect fun createPlatformEngine(): HttpClientEngine
  */
 fun createTmdbHttpClient(apiKey: String, engine: HttpClientEngine = createPlatformEngine()): HttpClient {
     return HttpClient(engine) {
+        expectSuccess = false
+
+        install(Resources)
+
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true

@@ -7,6 +7,7 @@ import com.ant.domain.usecases.tvseries.TvShowListUseCase
 import com.ant.models.model.Result
 import com.ant.models.request.TvShowType
 import com.ant.models.request.RequestType
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +22,7 @@ class TvShowViewModel constructor(
 
     private val _uiState = MutableStateFlow(TvShowUiState())
     val uiState: StateFlow<TvShowUiState> = _uiState.asStateFlow()
+    private var loadingJobs = mutableListOf<Job>()
 
     init {
         loadAllCategories()
@@ -34,6 +36,9 @@ class TvShowViewModel constructor(
      * Load TV shows for all categories to display in sections
      */
     private fun loadAllCategories(isRefresh: Boolean = false) {
+        loadingJobs.forEach { it.cancel() }
+        loadingJobs.clear()
+
         val categories = listOf(
             TvShowType.POPULAR,
             TvShowType.TOP_RATED,
@@ -41,9 +46,7 @@ class TvShowViewModel constructor(
             TvShowType.ONTV_NOW
         )
 
-        if (!isRefresh) {
-            _uiState.update { it.copy(isLoading = true) }
-        } else {
+        if (isRefresh) {
             _uiState.update { it.copy(isRefreshing = true) }
         }
 
@@ -56,7 +59,7 @@ class TvShowViewModel constructor(
      * Load TV shows for a specific category
      */
     private fun loadCategoryTvShows(category: TvShowType, isRefresh: Boolean = false) {
-        viewModelScope.launch {
+        loadingJobs += viewModelScope.launch {
             val request = RequestType.TvShowRequest(
                 tvSeriesType = category,
                 page = 1
@@ -85,7 +88,6 @@ class TvShowViewModel constructor(
                             )
                             currentState.copy(
                                 tvShowSections = updatedSections,
-                                isLoading = false,
                                 isRefreshing = false,
                                 error = null
                             )
@@ -102,7 +104,6 @@ class TvShowViewModel constructor(
                             )
                             currentState.copy(
                                 tvShowSections = updatedSections,
-                                isLoading = false,
                                 isRefreshing = false
                             )
                         }

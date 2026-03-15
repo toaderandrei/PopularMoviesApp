@@ -7,6 +7,7 @@ import com.ant.domain.usecases.movies.MovieListUseCase
 import com.ant.models.model.Result
 import com.ant.models.request.MovieType
 import com.ant.models.request.RequestType
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +22,7 @@ class MoviesViewModel constructor(
 
     private val _uiState = MutableStateFlow(MoviesUiState())
     val uiState: StateFlow<MoviesUiState> = _uiState.asStateFlow()
+    private var loadingJobs = mutableListOf<Job>()
 
     init {
         loadAllCategories()
@@ -34,6 +36,9 @@ class MoviesViewModel constructor(
      * Load movies for all categories to display in sections
      */
     private fun loadAllCategories(isRefresh: Boolean = false) {
+        loadingJobs.forEach { it.cancel() }
+        loadingJobs.clear()
+
         // Load all main categories
         val categories = listOf(
             MovieType.POPULAR,
@@ -42,9 +47,7 @@ class MoviesViewModel constructor(
             MovieType.UPCOMING
         )
 
-        if (!isRefresh) {
-            _uiState.update { it.copy(isLoading = true) }
-        } else {
+        if (isRefresh) {
             _uiState.update { it.copy(isRefreshing = true) }
         }
 
@@ -57,7 +60,7 @@ class MoviesViewModel constructor(
      * Load movies for a specific category
      */
     private fun loadCategoryMovies(category: MovieType, isRefresh: Boolean = false) {
-        viewModelScope.launch {
+        loadingJobs += viewModelScope.launch {
             val request = RequestType.MovieRequest(
                 movieType = category,
                 page = 1
@@ -86,7 +89,6 @@ class MoviesViewModel constructor(
                             )
                             currentState.copy(
                                 movieSections = updatedSections,
-                                isLoading = false,
                                 isRefreshing = false,
                                 error = null
                             )
@@ -103,7 +105,6 @@ class MoviesViewModel constructor(
                             )
                             currentState.copy(
                                 movieSections = updatedSections,
-                                isLoading = false,
                                 isRefreshing = false
                             )
                         }

@@ -1,6 +1,7 @@
 package com.ant.data.repositories
 
 import com.ant.data.repositories.favorites.FavoriteDetailsToRemoteRepository
+import com.ant.data.repositories.favorites.SyncFavoritesFromRemoteRepository
 import com.ant.data.repositories.favorites.UpdateFavoriteSyncStatusRepository
 import com.ant.models.request.FavoriteType
 import com.ant.models.request.RequestType
@@ -16,9 +17,11 @@ class DefaultFavoriteRepositoryTest {
 
     private val favoriteDetailsToRemoteRepository = mockk<FavoriteDetailsToRemoteRepository>()
     private val updateFavoriteSyncStatusRepository = mockk<UpdateFavoriteSyncStatusRepository>(relaxed = true)
+    private val syncFavoritesFromRemoteRepository = mockk<SyncFavoritesFromRemoteRepository>(relaxed = true)
     private val repository = DefaultFavoriteRepository(
         favoriteDetailsToRemoteRepository,
         updateFavoriteSyncStatusRepository,
+        syncFavoritesFromRemoteRepository,
     )
 
     @Test

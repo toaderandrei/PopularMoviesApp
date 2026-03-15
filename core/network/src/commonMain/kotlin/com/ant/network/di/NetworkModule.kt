@@ -1,15 +1,5 @@
 package com.ant.network.di
 
-import com.ant.network.api.KtorTmdbAuthApi
-import com.ant.network.api.KtorTmdbGenreApi
-import com.ant.network.api.KtorTmdbMoviesApi
-import com.ant.network.api.KtorTmdbSearchApi
-import com.ant.network.api.KtorTmdbTvSeriesApi
-import com.ant.network.api.TmdbAuthApi
-import com.ant.network.api.TmdbGenreApi
-import com.ant.network.api.TmdbMoviesApi
-import com.ant.network.api.TmdbSearchApi
-import com.ant.network.api.TmdbTvSeriesApi
 import com.ant.network.api.createTmdbHttpClient
 import com.ant.network.datasource.favorites.FetchFavoriteMoviesDataSource
 import com.ant.network.datasource.favorites.FetchFavoriteTvShowsDataSource
@@ -33,18 +23,11 @@ import org.koin.dsl.module
 
 /**
  * Koin module for network layer dependencies.
- * Provides HTTP client, API implementations, data sources, and mappers.
+ * Provides HTTP client, data sources, and mappers.
  */
 val networkModule = module {
     // HTTP Client
     single { createTmdbHttpClient(get(named("api_key"))) }
-
-    // API Implementations
-    single<TmdbMoviesApi> { KtorTmdbMoviesApi(get()) }
-    single<TmdbTvSeriesApi> { KtorTmdbTvSeriesApi(get()) }
-    single<TmdbGenreApi> { KtorTmdbGenreApi(get()) }
-    single<TmdbSearchApi> { KtorTmdbSearchApi(get()) }
-    single<TmdbAuthApi> { KtorTmdbAuthApi(get()) }
 
     // Mappers
     single { MovieDataMapper() }
@@ -56,14 +39,14 @@ val networkModule = module {
     single { LoginMapper() }
     single { LoginSessionMapper() }
 
-    // Data Sources
-    single { MovieListDataSource(get(), get(), get()) }
+    // Data Sources — now take HttpClient directly (no API interfaces)
+    single { MovieListDataSource(get(), get()) }
     single { MovieDetailsExtendedSummaryDataSource(get(), get()) }
     single { SaveAsFavoriteDataSource(get(), get()) }
-    single { TvSeriesListDataSource(get(), get(), get()) }
+    single { TvSeriesListDataSource(get(), get()) }
     single { TvSeriesDetailsExtendedSummaryDataSource(get(), get()) }
-    single { SearchMovieDataSource(get(), get(), get()) }
-    single { SearchTvShowDataSource(get(), get(), get()) }
+    single { SearchMovieDataSource(get(), get()) }
+    single { SearchTvShowDataSource(get(), get()) }
     single { FetchFavoriteMoviesDataSource(get()) }
     single { FetchFavoriteTvShowsDataSource(get()) }
 }

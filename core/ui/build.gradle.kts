@@ -35,7 +35,7 @@ dependencies {
     // Android-specific
     androidMainImplementation(platform(libs.androidx.compose.bom))
     androidMainImplementation(projects.core.resources)  // Backwards compat during migration
-    androidMainImplementation(libs.androidx.compose.ui.tooling.preview)
+    androidRuntimeClasspath(libs.androidx.compose.ui.tooling)
 
     // Testing
     commonTestImplementation(kotlin("test"))

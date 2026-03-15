@@ -21,6 +21,8 @@ dependencies {
     commonMainApi(libs.ktor.client.content.negotiation)
     commonMainApi(libs.ktor.serialization.kotlinx.json)
     commonMainApi(libs.ktor.client.logging)
+    commonMainApi(libs.ktor.client.resources)
+    commonMainApi(libs.ktor.resources)
 
     // Utilities
     commonMainApi(libs.kotlinx.datetime)  // For iOS framework export
@@ -34,4 +36,5 @@ dependencies {
     // Testing
     androidHostTestImplementation(libs.mockK)
     androidHostTestImplementation(libs.turbine)
+    androidHostTestImplementation(libs.ktor.client.mock)
 }

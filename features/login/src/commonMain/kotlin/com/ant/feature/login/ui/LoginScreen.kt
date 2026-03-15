@@ -39,6 +39,7 @@ import com.ant.resources.tmdb_account
 import com.ant.resources.unknown_error
 import com.ant.resources.username_account_title
 import org.jetbrains.compose.resources.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -135,6 +136,7 @@ fun LoginScreen(
     }
 }
 
+@Preview
 @Composable
 private fun LoginScreenIdlePreview() {
     MaterialTheme {
@@ -146,6 +148,7 @@ private fun LoginScreenIdlePreview() {
     }
 }
 
+@Preview
 @Composable
 private fun LoginScreenLoadingPreview() {
     MaterialTheme {
@@ -157,6 +160,7 @@ private fun LoginScreenLoadingPreview() {
     }
 }
 
+@Preview
 @Composable
 private fun LoginScreenErrorPreview() {
     MaterialTheme {
